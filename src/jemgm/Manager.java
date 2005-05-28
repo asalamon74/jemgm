@@ -674,12 +674,9 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
                 cc = new CommandCollection(getGame());
             }
             newTurn.setCc(cc);
-//             try {
-//                 newTurn.setAreadb(AODParser.getParser().mapCollectionProcess(v, false));
-//             } catch( ParseException e ) {
-//                 System.out.println("Exception: "+e);
-//             }
-            newTurn.setAreadb(getGame().mapCollectionProcess(v));
+            PlayersRelation plr = new PlayersRelation(getGame());
+            newTurn.setAreadb(getGame().mapCollectionProcess(v, plr));
+            newTurn.setPr(plr);
             getGame().setTurn(v, newTurn);
             return newTurn;
         }

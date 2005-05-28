@@ -45,7 +45,8 @@ public class Turn  {
      */
     public AreaDataBase getAreadb() {
 	if( areadb == null ) {
-	    setAreadb(game.mapCollectionProcess(turnNum));
+        System.out.println("pr:"+pr);
+	    setAreadb(game.mapCollectionProcess(turnNum, pr));
 	}
         return areadb;
     }

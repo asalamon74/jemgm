@@ -97,13 +97,12 @@ public class Map  {
     /**
      * Processes a file (report file format).
      */
-    public boolean processMapReportFormat(Game game, AreaDataBase adb, boolean headerProcess, boolean actual) {
+    public boolean processMapReportFormat(Game game, AreaDataBase adb, PlayersRelation pr, boolean headerProcess, boolean actual) {
         String line;
         
         System.out.println("processMapReport");
         ParserState state = ParserState.NOT_STARTED;
         Vector<String> headLines  = new Vector<String>();
-        PlayersRelation pr = null;
         int plNum=0;
         
         try {
@@ -228,9 +227,9 @@ public class Map  {
                         
                         break;
                     case RELATIONS:
-                        if( pr == null ) {
-                            pr = new PlayersRelation(game);
-                        }
+//                        if( pr == null ) {
+//                            pr = new PlayersRelation(game);
+//                        }
                         if( line.matches("\\=*")) {
                             // ===== line, ignore
                             continue;
@@ -297,14 +296,13 @@ public class Map  {
     /**
      * Processes a file (date file format).
      */
-    public boolean processMapDataFormat(Game game, AreaDataBase adb, boolean headerProcess, boolean actual) {
+    public boolean processMapDataFormat(Game game, AreaDataBase adb, PlayersRelation pr, boolean headerProcess, boolean actual) {
         try {
             System.out.println("headerProcess:"+headerProcess);
             BufferedReader fin = new BufferedReader(new FileReader(game.getDirectory()+getFileName()));
             String line;
             int lineNum = 1;
             StringTokenizer st;
-            PlayersRelation pr = null;
             int xsize = 0;
             int ysize = 0;
             while( (line = fin.readLine()) != null ) {
@@ -345,7 +343,7 @@ public class Map  {
                             st = new StringTokenizer(line, ",");
                             st.nextToken(); // ignore Number of Players label
                             //			game.setPlayerNum( Integer.parseInt(st.nextToken().trim()) );
-                            pr = new PlayersRelation(game);
+//                            pr = new PlayersRelation(game);
                             ++lineNum;
                             break;
                         case 5:
@@ -354,23 +352,25 @@ public class Map  {
                             String name = st.nextToken();
                             String relationString = st.nextToken();
                             if( !abbrev.equalsIgnoreCase("Unkwn") ) {
-                                Player p = game.getPlayer(abbrev);
-                                for( int i=0; i<relationString.length() && i<game.getPlayerNum(); ++i ) {
-                                    String c = ""+relationString.charAt(i);
-                                    if( "W".equals(c) ) {
-                                        pr.setRelation(p.getNum(), i, PlayersRelation.WAR);
-                                    } else if( "w".equals(c) ) {
-                                        pr.setRelation(p.getNum(), i, PlayersRelation.OFFERED_WAR);
-                                    } else if( "N".equals(c) ) {
-                                        pr.setRelation(p.getNum(), i, PlayersRelation.NEUTRAL);
-                                    } else if( "n".equals(c) ) {
-                                        pr.setRelation(p.getNum(), i, PlayersRelation.OFFERED_NEUTRAL);
-                                    } else if( "A".equals(c) ) {
-                                        pr.setRelation(p.getNum(), i, PlayersRelation.ALLY);
-                                    } else if( "a".equals(c) ) {
-                                        pr.setRelation(p.getNum(), i, PlayersRelation.OFFERED_ALLY);
-                                    } else if( "-".equals(c) ) {
-                                        pr.setRelation(p.getNum(), i, PlayersRelation.NOREL);
+                                if( pr != null ) {
+                                    Player p = game.getPlayer(abbrev);
+                                    for( int i=0; i<relationString.length() && i<game.getPlayerNum(); ++i ) {
+                                        String c = ""+relationString.charAt(i);
+                                        if( "W".equals(c) ) {
+                                            pr.setRelation(p.getNum(), i, PlayersRelation.WAR);
+                                        } else if( "w".equals(c) ) {
+                                            pr.setRelation(p.getNum(), i, PlayersRelation.OFFERED_WAR);
+                                        } else if( "N".equals(c) ) {
+                                            pr.setRelation(p.getNum(), i, PlayersRelation.NEUTRAL);
+                                        } else if( "n".equals(c) ) {
+                                            pr.setRelation(p.getNum(), i, PlayersRelation.OFFERED_NEUTRAL);
+                                        } else if( "A".equals(c) ) {
+                                            pr.setRelation(p.getNum(), i, PlayersRelation.ALLY);
+                                        } else if( "a".equals(c) ) {
+                                            pr.setRelation(p.getNum(), i, PlayersRelation.OFFERED_ALLY);
+                                        } else if( "-".equals(c) ) {
+                                            pr.setRelation(p.getNum(), i, PlayersRelation.NOREL);
+                                        }
                                     }
                                 }
                             } else {
@@ -448,9 +448,9 @@ public class Map  {
         return true;
     }
     
-    public boolean processMap(Game game, AreaDataBase adb, boolean headerProcess, boolean actual) {
-        if( !processMapReportFormat(game, adb, headerProcess, actual) ) {
-            return processMapDataFormat(game, adb, headerProcess, actual);
+    public boolean processMap(Game game, AreaDataBase adb, PlayersRelation pr, boolean headerProcess, boolean actual) {
+        if( !processMapReportFormat(game, adb, pr, headerProcess, actual) ) {
+            return processMapDataFormat(game, adb, pr, headerProcess, actual);
         } else {
             return true;
         }

@@ -337,7 +337,7 @@ public class Game  {
         this.botEmail = botEmail;
     }
     
-    public AreaDataBase mapCollectionProcess(int turnNum) {
-        return mapcoll.calculateAreaDatabase(turnNum);
+    public AreaDataBase mapCollectionProcess(int turnNum, PlayersRelation pr) {
+        return mapcoll.calculateAreaDatabase(turnNum, pr);
     }
 } // AODGame

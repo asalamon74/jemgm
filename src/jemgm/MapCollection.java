@@ -126,15 +126,15 @@ public class MapCollection  {
         this.latestTurn = v;
     }
     
-    public AreaDataBase calculateAreaDatabase(int turnNum) {
-        return calculateAreaDatabase(turnNum, false);
+    public AreaDataBase calculateAreaDatabase(int turnNum, PlayersRelation pr) {
+        return calculateAreaDatabase(turnNum, false, pr);
     }
     
-    public AreaDataBase calculateAreaDatabase(int turnNum, boolean onlyMyMap) {
-        System.out.println("mapCollNum:"+getMapCount());
-        System.out.println("calculateAreaDatabase: "+turnNum);
+    public AreaDataBase calculateAreaDatabase(int turnNum, boolean onlyMyMap, PlayersRelation pr) {
+        //System.out.println("mapCollNum:"+getMapCount());
+        //System.out.println("calculateAreaDatabase: "+turnNum);
         Player actPlayer = game.getPlayer();
-        System.out.println("actPlayer:"+actPlayer.getNum());
+        //System.out.println("actPlayer:"+actPlayer.getNum());
         Map m = getLatestMap(actPlayer, turnNum);
         System.out.println("m:"+m);
         FileInputStream fis = null;
@@ -146,13 +146,13 @@ public class MapCollection  {
             adb = new AreaDataBase(game);
         }
         
-        AreaInformation ai269 = adb.getAreaInformation(269);
+        //AreaInformation ai269 = adb.getAreaInformation(269);
         // my map
         boolean actual = true;
         int actturn = m.getTurnNum();
-        m.processMap(game, adb, true, actual);
-        System.out.println("my map processed");
-        ai269 = adb.getAreaInformation(269);
+        m.processMap(game, adb, pr, true, actual);
+        //System.out.println("my map processed");
+        //ai269 = adb.getAreaInformation(269);
         // other maps
         if( !onlyMyMap ) {
             Vector<Map> v = getLatestMaps(turnNum);
@@ -160,7 +160,7 @@ public class MapCollection  {
                 m = v.elementAt(i);
                 if( !m.getPlayer().equals(actPlayer) ) {
                     actual = ( actturn ==  m.getTurnNum() );
-                    m.processMap(game, adb, false, actual);
+                    m.processMap(game, adb, pr, false, actual);
                 }
             }
         }

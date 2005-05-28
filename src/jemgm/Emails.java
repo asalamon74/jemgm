@@ -137,11 +137,11 @@ public class Emails extends javax.swing.JFrame implements ActionListener {
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         setBounds((screenSize.width-549)/2, (screenSize.height-443)/2, 549, 443);
     }//GEN-END:initComponents
-
+    
     private void grabButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_grabButtonActionPerformed
         JFileChooser fc = new JFileChooser();
         fc.setDialogTitle("Load report file");
-
+        
         int retVal = fc.showOpenDialog(this);
         if( retVal != JFileChooser.APPROVE_OPTION ) {
             return;
@@ -171,58 +171,58 @@ public class Emails extends javax.swing.JFrame implements ActionListener {
             }
         } catch( IOException e ) {
             System.out.println("grab Emails Exception: "+e);
-            JOptionPane.showMessageDialog(this, "Cannot grab e-mails", "Warning", JOptionPane.WARNING_MESSAGE);            
+            JOptionPane.showMessageDialog(this, "Cannot grab e-mails", "Warning", JOptionPane.WARNING_MESSAGE);
         }
         
     }//GEN-LAST:event_grabButtonActionPerformed
-
+    
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         // Add your handling code here:
         aodm.getGame().setBotEmail(botEmailTextField.getText());
-	aodm.bccSelf = bccCheckBox.isSelected();
+        aodm.bccSelf = bccCheckBox.isSelected();
         Player p;
         for( int i=1; i<aodm.getGame().getPlayerNum(); ++i ) {
-            p = aodm.getGame().getPlayer(i);            
+            p = aodm.getGame().getPlayer(i);
             p.setEmail(playerTextFields[i].getText());
         }
         setVisible(false);
     }//GEN-LAST:event_okButtonActionPerformed
-
+    
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         // Add your handling code here:
         setVisible(false);
     }//GEN-LAST:event_cancelButtonActionPerformed
-
+    
     private void fillComponents() {
         // bot email
         botEmailTextField.setText(aodm.getGame().getBotEmail());
-	// bcc
-	bccCheckBox.setSelected(aodm.bccSelf);
-	// player e-mails
+        // bcc
+        bccCheckBox.setSelected(aodm.bccSelf);
+        // player e-mails
         playerLabels = new JLabel[aodm.getGame().getPlayerNum()];
         playerTextFields = new JTextField[aodm.getGame().getPlayerNum()];
-	playerSendButtons = new JButton[aodm.getGame().getPlayerNum()];
-	playerSendWholeButtons = new JButton[aodm.getGame().getPlayerNum()];
+        playerSendButtons = new JButton[aodm.getGame().getPlayerNum()];
+        playerSendWholeButtons = new JButton[aodm.getGame().getPlayerNum()];
         Player p;
         scrollPanel.setLayout(new java.awt.GridLayout(aodm.getGame().getPlayerNum(), 1));
-	Dimension d = new JLabel("Denethuorin").getPreferredSize();
+        Dimension d = new JLabel("Denethuorin").getPreferredSize();
         for( int i=1; i<aodm.getGame().getPlayerNum(); ++i ) {
-	    JPanel mapControls = new JPanel();
-	    mapControls.setLayout(new FlowLayout(FlowLayout.RIGHT, 1, 1));
+            JPanel mapControls = new JPanel();
+            mapControls.setLayout(new FlowLayout(FlowLayout.RIGHT, 1, 1));
             p = aodm.getGame().getPlayer(i);
             playerLabels[i] = new JLabel(p.name);
-	    playerLabels[i].setPreferredSize(d);
+            playerLabels[i].setPreferredSize(d);
             playerTextFields[i] = new JTextField(p.getEmail(),20);
-	    playerSendButtons[i] = new JButton("Send map");
-	    playerSendButtons[i].addActionListener(this);
-	    playerSendWholeButtons[i] = new JButton("Send whole map");
-	    playerSendWholeButtons[i].addActionListener(this);
-
+            playerSendButtons[i] = new JButton("Send map");
+            playerSendButtons[i].addActionListener(this);
+            playerSendWholeButtons[i] = new JButton("Send whole map");
+            playerSendWholeButtons[i].addActionListener(this);
+            
             mapControls.add(playerLabels[i]);
-            mapControls.add(playerTextFields[i]);   
-	    mapControls.add(playerSendButtons[i]);
-	    mapControls.add(playerSendWholeButtons[i]);
-	    scrollPanel.add(mapControls);
+            mapControls.add(playerTextFields[i]);
+            mapControls.add(playerSendButtons[i]);
+            mapControls.add(playerSendWholeButtons[i]);
+            scrollPanel.add(mapControls);
         }
     }
     
@@ -234,62 +234,61 @@ public class Emails extends javax.swing.JFrame implements ActionListener {
     private void exitForm(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_exitForm
         System.exit(0);
     }//GEN-LAST:event_exitForm
-
+    
     public void actionPerformed(java.awt.event.ActionEvent evt) {
         Object source = evt.getSource();
-	boolean onlyMyMap=true;
-	int playerIndex = -1;
-	for( int i=0; i<aodm.getGame().getPlayerNum(); ++i ) {
-	    if( source.equals(playerSendButtons[i] ) ) {
-		onlyMyMap = true;
-		playerIndex = i;
-		break;
-	    }
-	}
-	for( int i=0; i<aodm.getGame().getPlayerNum(); ++i ) {
-	    if( source.equals(playerSendWholeButtons[i] ) ) {
-		onlyMyMap = false;
-		playerIndex = i;
-		break;
-	    }
-	}
-	if( playerIndex > -1 ) {
-	    //		AreaDataBase adb = AODParser.getParser().mapCollectionProcess(aodm.getActTurnNumber(), onlyMyMap);
-	    AreaDataBase adb = aodm.getGame().getMapcoll().calculateAreaDatabase(aodm.getActTurnNumber(), onlyMyMap);
-	    String mapMailMessage = adb.createWinAODFile();
-	    System.out.println(mapMailMessage);
-	    sendMapMail(playerTextFields[playerIndex].getText(), mapMailMessage);
-	}
-
+        boolean onlyMyMap=true;
+        int playerIndex = -1;
+        for( int i=0; i<aodm.getGame().getPlayerNum(); ++i ) {
+            if( source.equals(playerSendButtons[i] ) ) {
+                onlyMyMap = true;
+                playerIndex = i;
+                break;
+            }
+        }
+        for( int i=0; i<aodm.getGame().getPlayerNum(); ++i ) {
+            if( source.equals(playerSendWholeButtons[i] ) ) {
+                onlyMyMap = false;
+                playerIndex = i;
+                break;
+            }
+        }
+        if( playerIndex > -1 ) {
+            AreaDataBase adb = aodm.getGame().getMapcoll().calculateAreaDatabase(aodm.getActTurnNumber(), onlyMyMap, null);
+            String mapMailMessage = adb.createWinAODFile();
+            System.out.println(mapMailMessage);
+            sendMapMail(playerTextFields[playerIndex].getText(), mapMailMessage);
+        }
+        
     }
-
+    
     public void sendMapMail(String toAddress, String mapMailMessage) {
-	try {
-	    String fromAddress = aodm.getGame().getPlayer().getEmail();
-	    if( fromAddress == null || fromAddress.equals("") ) {
-		JOptionPane.showMessageDialog(this, "Please fill out you e-mail address", "Email warning", JOptionPane.WARNING_MESSAGE);
-	    } else {
-		Properties props = System.getProperties();
-		Session session = Session.getDefaultInstance(props, null);
-		Message msg = new MimeMessage(session);
-		msg.setFrom(new InternetAddress(fromAddress));
-		msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toAddress, false));
-		if( aodm.bccSelf ) {
-		    msg.setRecipients(Message.RecipientType.BCC,
-				      InternetAddress.parse(fromAddress, false));
-		}
-		msg.setSubject(aodm.getGame().getGameId());
-		msg.setText(mapMailMessage);
-		msg.setSentDate(new Date());
-		Transport.send(msg);
-		JOptionPane.showMessageDialog(this, "E-mail sent to "+toAddress+" address", "E-mail", JOptionPane.INFORMATION_MESSAGE);
-	    }
-	} catch ( MessagingException me ) {
-	    me.printStackTrace();
-	    System.out.println("me:"+me);
-	    JOptionPane.showMessageDialog(this, "Cannot send mail: "+me, "Mail Error", JOptionPane.ERROR_MESSAGE);
-	}
-
+        try {
+            String fromAddress = aodm.getGame().getPlayer().getEmail();
+            if( fromAddress == null || fromAddress.equals("") ) {
+                JOptionPane.showMessageDialog(this, "Please fill out you e-mail address", "Email warning", JOptionPane.WARNING_MESSAGE);
+            } else {
+                Properties props = System.getProperties();
+                Session session = Session.getDefaultInstance(props, null);
+                Message msg = new MimeMessage(session);
+                msg.setFrom(new InternetAddress(fromAddress));
+                msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toAddress, false));
+                if( aodm.bccSelf ) {
+                    msg.setRecipients(Message.RecipientType.BCC,
+                            InternetAddress.parse(fromAddress, false));
+                }
+                msg.setSubject(aodm.getGame().getGameId());
+                msg.setText(mapMailMessage);
+                msg.setSentDate(new Date());
+                Transport.send(msg);
+                JOptionPane.showMessageDialog(this, "E-mail sent to "+toAddress+" address", "E-mail", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch ( MessagingException me ) {
+            me.printStackTrace();
+            System.out.println("me:"+me);
+            JOptionPane.showMessageDialog(this, "Cannot send mail: "+me, "Mail Error", JOptionPane.ERROR_MESSAGE);
+        }
+        
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

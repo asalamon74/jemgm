@@ -24,8 +24,8 @@ public class VisualPlayersRelation extends JFrame {
         getContentPane().setLayout(new GridLayout(plnum,plnum,2,2));
         for( int i=0; i<plnum; ++i ) {
             for( int j=0; j<plnum; ++j ) {
-                String label = PlayersRelation.abbr[pr.getSimpleRelation(i,j)];
-                String tooltip = PlayersRelation.name[pr.getSimpleRelation(i,j)];
+                String label = pr.getSimpleRelation(i,j).abbrev;
+                String tooltip = pr.getSimpleRelation(i,j).abbrev;
                 if( i == 0 && j == 0 ) {
                     label = "";
                 } else if( i == 0 ) {
@@ -42,16 +42,16 @@ public class VisualPlayersRelation extends JFrame {
                 JLabel lab = new JLabel(label);
                 lab.setToolTipText(tooltip);
                 
-                int rel1 = pr.getRelation(i,j);
-                int rel2 = pr.getRelation(j,i);
+                PlayersRelation.RelationType rel1 = pr.getRelation(i,j);
+                PlayersRelation.RelationType rel2 = pr.getRelation(j,i);
                 
-                if( pr.getSimpleRelation(i,j) != rel1 ||
-                        pr.getSimpleRelation(i,j) != rel2 ) {
+                if( !pr.getSimpleRelation(i,j).equals( rel1 ) ||
+                    !pr.getSimpleRelation(i,j).equals( rel2 ) ) {
                     lab.setFont(new Font("Helvetica", Font.BOLD, 14));
                     lab.setToolTipText(pr.getAllianceHeadline(i,j));
                 }
                 if( i != 0 && j != 0 ) {
-                    lab.setForeground(PlayersRelation.color[pr.getSimpleRelation(i,j)]);
+                    lab.setForeground(pr.getSimpleRelation(i,j).color);
                 }
                 getContentPane().add(lab);
             }

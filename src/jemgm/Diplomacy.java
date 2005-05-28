@@ -27,11 +27,11 @@ public class Diplomacy extends JFrame implements ActionListener, ListSelectionLi
     public Diplomacy(Game game, PlayersRelation pr, CommandCollection cc) {
         this.pr = pr;
         this.cc = cc;
-	this.game = game;
+        this.game = game;
         initComponents();
         initData();
     }
-
+    
     private void initComponents() {
         setSize(400,570);
         setTitle("Diplomacy ["+game.getPlayer().getName()+"]");
@@ -55,7 +55,7 @@ public class Diplomacy extends JFrame implements ActionListener, ListSelectionLi
         GridBagLayout gbl = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
         getContentPane().setLayout(gbl);
-
+        
         // labels
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridwidth=1;
@@ -64,42 +64,42 @@ public class Diplomacy extends JFrame implements ActionListener, ListSelectionLi
         c.weighty = 0;
         gbl.setConstraints(alliesLabel, c);
         getContentPane().add(alliesLabel);
-
+        
         c.gridwidth=2;
         gbl.setConstraints(neutralsLabel, c);
         getContentPane().add(neutralsLabel);
-
+        
         c.gridwidth=1;
         c.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(enemiesLabel, c);
         getContentPane().add(enemiesLabel);
-
+        
         // listboxes
         c.gridwidth = 1;
         c.weighty = 100;
         c.fill = GridBagConstraints.BOTH;
         gbl.setConstraints(alliesList, c);
         getContentPane().add(alliesList);
-
+        
         c.gridwidth=2;
         gbl.setConstraints(neutralsList, c);
         getContentPane().add(neutralsList);
-
+        
         c.gridwidth=1;
         c.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(enemiesList, c);
         getContentPane().add(enemiesList);
-
+        
         c.weighty = 0;
         c.gridwidth = 1;
         gbl.setConstraints(messageLabel, c);
         getContentPane().add(messageLabel);
-
+        
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.weightx = 100;
         gbl.setConstraints(messageTextField, c);
         getContentPane().add(messageTextField);
-
+        
         // commandsList
         commandsList = new JList(new DefaultListModel());
         c.gridwidth = GridBagConstraints.RELATIVE;
@@ -107,36 +107,36 @@ public class Diplomacy extends JFrame implements ActionListener, ListSelectionLi
         c.weighty=100;
         gbl.setConstraints(commandsList, c);
         getContentPane().add(commandsList);
-
+        
         // buttons
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.gridheight = 1;
         c.weighty = 0;
-
+        
         gbl.setConstraints(neutral1Button, c);
         getContentPane().add(neutral1Button);
-
+        
         gbl.setConstraints(neutral2Button, c);
         getContentPane().add(neutral2Button);
-
+        
         gbl.setConstraints(allyButton, c);
         getContentPane().add(allyButton);
-
+        
         gbl.setConstraints(warButton, c);
         getContentPane().add(warButton);
-
+        
         gbl.setConstraints(sendButton, c);
         getContentPane().add(sendButton);
-
+        
         gbl.setConstraints(gaAllButton, c);
         getContentPane().add(gaAllButton);
-
+        
         gbl.setConstraints(caButton, c);
         getContentPane().add(caButton);
-
+        
         gbl.setConstraints(deleteButton, c);
         getContentPane().add(deleteButton);
-
+        
         neutral1Button.addActionListener(this);
         neutral2Button.addActionListener(this);
         warButton.addActionListener(this);
@@ -149,15 +149,15 @@ public class Diplomacy extends JFrame implements ActionListener, ListSelectionLi
         enemiesList.addListSelectionListener(this);
         alliesList.addListSelectionListener(this);
         commandsList.addListSelectionListener(this);
-
+        
         addWindowListener(new java.awt.event.WindowAdapter() {
-                public void windowClosing(WindowEvent evt) {
-                    exitForm(evt);
-                }
-            });
+            public void windowClosing(WindowEvent evt) {
+                exitForm(evt);
+            }
+        });
     }
-
-
+    
+    
     public void initData() {
         // playerRelation
         int pl = game.getPlayer().getNum();
@@ -165,12 +165,18 @@ public class Diplomacy extends JFrame implements ActionListener, ListSelectionLi
             if( i == pl ) {
                 continue;
             }
-            int rel = pr.getSimpleRelation(i,pl);
+            PlayersRelation.RelationType rel = pr.getSimpleRelation(i,pl);
             String name = game.getPlayer(i).getName();
             switch( rel ) {
-            case PlayersRelation.WAR: ((DefaultListModel)enemiesList.getModel()).addElement(name); break;          
-            case PlayersRelation.NEUTRAL: ((DefaultListModel)neutralsList.getModel()).addElement(name); break;
-            case PlayersRelation.ALLY: ((DefaultListModel)alliesList.getModel()).addElement(name); break;
+                case WAR: 
+                     ((DefaultListModel)enemiesList.getModel()).addElement(name); 
+                     break;
+                case NEUTRAL: 
+                    ((DefaultListModel)neutralsList.getModel()).addElement(name); 
+                    break;
+                case ALLY: 
+                    ((DefaultListModel)alliesList.getModel()).addElement(name); 
+                    break;
             }
         }
         // commands
@@ -180,97 +186,97 @@ public class Diplomacy extends JFrame implements ActionListener, ListSelectionLi
                 String name = game.getPlayer(c.getIntParam(0)).getName();
                 int index=0;
                 while( index < neutralsList.getModel().getSize() &&
-                       !neutralsList.getModel().getElementAt(index).equals(name) ) {
+                        !neutralsList.getModel().getElementAt(index).equals(name) ) {
                     ++index;
                 }
                 if( index < neutralsList.getModel().getSize() ) {
                     neutralsList.setSelectedIndex(index);
                     movePlayer(neutralsList, alliesList, CommandType.DA, false);
                 }
-	    } else if( c.getType().equals( CommandType.DW ) ){
+            } else if( c.getType().equals( CommandType.DW ) ){
                 String name = game.getPlayer(c.getIntParam(0)).getName();
                 int index=0;
                 while( index < neutralsList.getModel().getSize() &&
-                       !neutralsList.getModel().getElementAt(index).equals(name) ) {
+                        !neutralsList.getModel().getElementAt(index).equals(name) ) {
                     ++index;
                 }
                 if( index < neutralsList.getModel().getSize() ) {
                     neutralsList.setSelectedIndex(index);
                 }
                 movePlayer(neutralsList, enemiesList, CommandType.DW, false);
-	    } else if( c.getType().equals( CommandType.DN ) ){
-		//		System.out.println("intparam:"+c.getIntParam(0));
+            } else if( c.getType().equals( CommandType.DN ) ){
+                //		System.out.println("intparam:"+c.getIntParam(0));
                 String name = game.getPlayer(c.getIntParam(0)).getName();
-		//		System.out.println("name: "+name);
+                //		System.out.println("name: "+name);
                 int index=0;
                 while( index < alliesList.getModel().getSize() &&
-                       !alliesList.getModel().getElementAt(index).equals(name) ) {
+                        !alliesList.getModel().getElementAt(index).equals(name) ) {
                     ++index;
                 }
                 if( index < alliesList.getModel().getSize() ) {
-		    // ally -> neutral
+                    // ally -> neutral
                     alliesList.setSelectedIndex(index);
-		    movePlayer(alliesList, neutralsList, CommandType.DN, false);
+                    movePlayer(alliesList, neutralsList, CommandType.DN, false);
                 } else {
-		    index = 0;
-		    while( index < enemiesList.getModel().getSize() &&
-			   !enemiesList.getModel().getElementAt(index).equals(name) ) {
-			++index;
-		    }
-		    if( index < enemiesList.getModel().getSize() ) {
-			// enemy -> neutral
-			enemiesList.setSelectedIndex(index);
-			movePlayer(enemiesList, neutralsList, CommandType.DN, false);
-		    }
-		}
-	    } else if( c.getType().equals( CommandType.ME ) ){
+                    index = 0;
+                    while( index < enemiesList.getModel().getSize() &&
+                            !enemiesList.getModel().getElementAt(index).equals(name) ) {
+                        ++index;
+                    }
+                    if( index < enemiesList.getModel().getSize() ) {
+                        // enemy -> neutral
+                        enemiesList.setSelectedIndex(index);
+                        movePlayer(enemiesList, neutralsList, CommandType.DN, false);
+                    }
+                }
+            } else if( c.getType().equals( CommandType.ME ) ){
                 String player = game.getPlayer(c.getIntParam(0)).getName();
                 String message = c.getParam(1);
                 messageHashtable.put(player, message);
                 addCommand(c,player);
-	    } else if( c.getType().equals( CommandType.GA ) ){
+            } else if( c.getType().equals( CommandType.GA ) ){
                 String gaPlayer = game.getPlayer(c.getIntParam(0)).getName();
                 String param1 = c.getParam(1);
                 if( param1.equalsIgnoreCase("all") ) {
                     addCommand(c, gaPlayer);
                 }
-	    } else if( c.getType().equals( CommandType.CA ) ) {
+            } else if( c.getType().equals( CommandType.CA ) ) {
                 String allyPlayer = game.getPlayer(c.getIntParam(0)).getName();
                 String enemyPlayer = game.getPlayer(c.getIntParam(1)).getName();
-		//                addCommand(c, allyPlayer + ", " + enemyPlayer);
-		addCommand(c);
+                //                addCommand(c, allyPlayer + ", " + enemyPlayer);
+                addCommand(c);
             }
         }
     }
-
+    
     private void exitForm(WindowEvent evt) {
         setVisible(false);
-        // TODO: some kind of destroy, 
+        // TODO: some kind of destroy,
         //       or change the whole class to be a Singleton
     }
-
+    
     private boolean checkPlayer(JList list) {
         int index = list.getSelectedIndex();
         if( index != -1 ) {
             String item = (String)list.getModel().getElementAt(index);
             int plnum =  game.getPlayer(item).getNum();
             int i = 0;
-            while( i < cc.getCommandNum() && 
-                   ((cc.getCommand(i).getType() != CommandType.DA &&
-                   cc.getCommand(i).getType() != CommandType.DN &&
-                   cc.getCommand(i).getType() != CommandType.DW) ||
-                   cc.getCommand(i).getIntParam(0) != plnum )) {
+            while( i < cc.getCommandNum() &&
+                    ((cc.getCommand(i).getType() != CommandType.DA &&
+                    cc.getCommand(i).getType() != CommandType.DN &&
+                    cc.getCommand(i).getType() != CommandType.DW) ||
+                    cc.getCommand(i).getIntParam(0) != plnum )) {
                 ++i;
             }
             return i >= cc.getCommandNum();
         }
         return false;
     }
-
+    
     private void movePlayer(JList fromList, JList toList, CommandType command, boolean putcc) {
         int index = fromList.getSelectedIndex();
         if( index != -1 ) {
-            String item = (String)fromList.getModel().getElementAt(index); 
+            String item = (String)fromList.getModel().getElementAt(index);
             ((DefaultListModel)toList.getModel()).addElement(item);
             ((DefaultListModel)fromList.getModel()).removeElement(item);
             Command c = new Command(game, command, game.getPlayer(item).getNum());
@@ -280,7 +286,7 @@ public class Diplomacy extends JFrame implements ActionListener, ListSelectionLi
             addCommand(c);
         }
     }
-
+    
     private boolean messageCreate(JList l) {
         if( l.getSelectedIndex() != -1 ) {
             String player = (String)l.getSelectedValue();
@@ -294,7 +300,7 @@ public class Diplomacy extends JFrame implements ActionListener, ListSelectionLi
         }
         return false;
     }
-
+    
     private int selectedPlayer() {
         if( neutralsList.getSelectedIndex() != -1 ) {
             return game.getPlayer((String)neutralsList.getSelectedValue()).getNum();
@@ -307,7 +313,7 @@ public class Diplomacy extends JFrame implements ActionListener, ListSelectionLi
         }
         return 0;
     }
-
+    
     public void actionPerformed(java.awt.event.ActionEvent evt) {
         Object source = evt.getSource();
         JList l1=null,l2=null;
@@ -324,7 +330,7 @@ public class Diplomacy extends JFrame implements ActionListener, ListSelectionLi
             l1 = neutralsList;
             l2 = alliesList;
             command = CommandType.DA;
-        } else if( source.equals(warButton) ) {            
+        } else if( source.equals(warButton) ) {
             l1 = neutralsList;
             l2 = enemiesList;
             command = CommandType.DW;
@@ -332,12 +338,12 @@ public class Diplomacy extends JFrame implements ActionListener, ListSelectionLi
             messageCreate(alliesList);
             messageCreate(neutralsList);
             messageCreate(enemiesList);
-        } else if( source.equals(gaAllButton) ) {            
+        } else if( source.equals(gaAllButton) ) {
             int selPl = selectedPlayer();
             Command c = new Command(game, CommandType.GA, selPl, "all");
             addCommand(c, game.getPlayer(selPl).getName());
             cc.addCommand(c);
-        } else if( source.equals(caButton) ) {            
+        } else if( source.equals(caButton) ) {
             if( !checkPlayer(alliesList) ) {
                 JOptionPane.showMessageDialog(this, "You must choose an allied player", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -346,12 +352,12 @@ public class Diplomacy extends JFrame implements ActionListener, ListSelectionLi
             ps.setVisible(true);
             int selPl = selectedPlayer();
             Player selPl2 = ps.getSelectedPlayer();
-	    if( selPl2 != null ) {
-		Command c = new Command(game, CommandType.CA, selPl, selPl2.getNum());
-		addCommand(c, game.getPlayer(selPl).getName() + "," +selPl2.getName());
-		cc.addCommand(c);
-	    }
-        } else if( source.equals(deleteButton) ) {            
+            if( selPl2 != null ) {
+                Command c = new Command(game, CommandType.CA, selPl, selPl2.getNum());
+                addCommand(c, game.getPlayer(selPl).getName() + "," +selPl2.getName());
+                cc.addCommand(c);
+            }
+        } else if( source.equals(deleteButton) ) {
             removeCommand();
         }
         if( command != null ) {
@@ -363,30 +369,30 @@ public class Diplomacy extends JFrame implements ActionListener, ListSelectionLi
             }
         }
     }
-
+    
     // TODO: eliminate this
     protected void addCommand(Command c, String plusInfo) {
-	((DefaultListModel)commandsList.getModel()).addElement(""+c+" ["+plusInfo+"]");
+        ((DefaultListModel)commandsList.getModel()).addElement(""+c+" ["+plusInfo+"]");
         diplomacyCommands.addElement(c);
     }
-
+    
     protected void addCommand(Command c) {
         ((DefaultListModel)commandsList.getModel()).addElement(c.toHumanReadableString());
         diplomacyCommands.addElement(c);
     }
-
+    
     protected void removeCommand() {
         int index = commandsList.getSelectedIndex();
         if( index == -1 ) {
             return;
         }
-	((DefaultListModel)commandsList.getModel()).remove(index);
+        ((DefaultListModel)commandsList.getModel()).remove(index);
         Command c = diplomacyCommands.elementAt(index);
         cc.removeCommand(c);
         diplomacyCommands.removeElementAt(index);
-	// TODO: put it back to the original list
+        // TODO: put it back to the original list
     }
-
+    
     public void valueChanged(ListSelectionEvent e) {
         JList i = (JList)e.getSource();
         if( i.equals(commandsList) ) {
@@ -415,27 +421,27 @@ public class Diplomacy extends JFrame implements ActionListener, ListSelectionLi
     }
     
     class CASelectablePlayers implements PlayerSelectable {
-
+        
         public CASelectablePlayers(Player caller, Player called) {
             this.caller = caller;
             this.called = called;
         }
-
+        
         public boolean select(Player p) {
             if( p.equals(caller)  || p.equals(called) ) {
                 return false;
             }
-            return pr.getSimpleRelation(caller.getNum(), p.getNum()) == PlayersRelation.WAR;
+            return pr.getSimpleRelation(caller.getNum(), p.getNum()) == PlayersRelation.RelationType.WAR;
         }
-
+        
         protected Player caller;
         protected Player called;
     }
-
+    
     private JLabel alliesLabel;
     private JLabel neutralsLabel;
     private JLabel enemiesLabel;
-    private JList alliesList; 
+    private JList alliesList;
     private JList neutralsList;
     private JList enemiesList;
     private JButton neutral1Button;
@@ -449,7 +455,7 @@ public class Diplomacy extends JFrame implements ActionListener, ListSelectionLi
     private JButton gaAllButton;
     private JButton caButton;
     private JButton deleteButton;
-
+    
     private PlayersRelation pr;
     private CommandCollection cc;
     private Game game;

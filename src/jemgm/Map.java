@@ -357,19 +357,19 @@ public class Map  {
                                     for( int i=0; i<relationString.length() && i<game.getPlayerNum(); ++i ) {
                                         String c = ""+relationString.charAt(i);
                                         if( "W".equals(c) ) {
-                                            pr.setRelation(p.getNum(), i, PlayersRelation.WAR);
+                                            pr.setRelation(p.getNum(), i, PlayersRelation.RelationType.WAR);
                                         } else if( "w".equals(c) ) {
-                                            pr.setRelation(p.getNum(), i, PlayersRelation.OFFERED_WAR);
+                                            pr.setRelation(p.getNum(), i, PlayersRelation.RelationType.OFFERED_WAR);
                                         } else if( "N".equals(c) ) {
-                                            pr.setRelation(p.getNum(), i, PlayersRelation.NEUTRAL);
+                                            pr.setRelation(p.getNum(), i, PlayersRelation.RelationType.NEUTRAL);
                                         } else if( "n".equals(c) ) {
-                                            pr.setRelation(p.getNum(), i, PlayersRelation.OFFERED_NEUTRAL);
+                                            pr.setRelation(p.getNum(), i, PlayersRelation.RelationType.OFFERED_NEUTRAL);
                                         } else if( "A".equals(c) ) {
-                                            pr.setRelation(p.getNum(), i, PlayersRelation.ALLY);
+                                            pr.setRelation(p.getNum(), i, PlayersRelation.RelationType.ALLY);
                                         } else if( "a".equals(c) ) {
-                                            pr.setRelation(p.getNum(), i, PlayersRelation.OFFERED_ALLY);
+                                            pr.setRelation(p.getNum(), i, PlayersRelation.RelationType.OFFERED_ALLY);
                                         } else if( "-".equals(c) ) {
-                                            pr.setRelation(p.getNum(), i, PlayersRelation.NOREL);
+                                            pr.setRelation(p.getNum(), i, PlayersRelation.RelationType.NOREL);
                                         }
                                     }
                                 }

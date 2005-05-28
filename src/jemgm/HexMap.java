@@ -114,10 +114,11 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
      * This is the real paint method.
      */
     public void realPaint(Graphics g) {
-        System.out.println("realPaint");
         g.setColor(getBackground());
         g.fillRect(0, 0, (int)(2*adb.getXSize()*xdiff), (int)(2*adb.getYSize()*ydiff));
         g.setColor(borderColor);
+        
+        // main loop to draw the board
         for( int i=1; i<=2*adb.getXSize(); ++i ) {
             for( int j=1; j<=2*adb.getYSize(); ++j ) {
                 int reali = ((i-1) % adb.getXSize()) + 1;
@@ -137,55 +138,54 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
                     g.fillPolygon(xpoints, ypoints, 6);
                     g.setColor(borderColor);
                     g.drawPolygon(xpoints, ypoints, 6);
-                }
-                if( supplyDraw && ai != null && ai.getX(1) == reali && ai.getY(1) == realj &&
-                        ai.getSupplyPointNum() != 0 ) {
-                    if( drawUnitHere(ai, reali, realj) ||
-                            drawNewUnitHere(ai, reali, realj)) {
-                        if( ai.isCapital() ) {
-                            drawCapital(g, i, j, getColor(ai.getOwner()), false);
+                    if( supplyDraw && ai != null && ai.getX(1) == reali && ai.getY(1) == realj &&
+                            ai.getSupplyPointNum() != 0 ) {
+                        if( drawUnitHere(ai, reali, realj) ||
+                                drawNewUnitHere(ai, reali, realj)) {
+                            if( ai.isCapital() ) {
+                                drawCapital(g, i, j, getColor(ai.getOwner()), false);
+                            } else {
+                                drawSmallSupplyPoints(g, i, j, ai.getSupplyPointNum());
+                            }
                         } else {
-                            drawSmallSupplyPoints(g, i, j, ai.getSupplyPointNum());
-                        }
-                    } else {
-                        if( ai.isCapital() ) {
-                            drawCapital(g, i, j, getColor(ai.getOwner()), true);
-                        } else {
-                            drawSupplyPoints(g, i, j, ai.getSupplyPointNum());
+                            if( ai.isCapital() ) {
+                                drawCapital(g, i, j, getColor(ai.getOwner()), true);
+                            } else {
+                                drawSupplyPoints(g, i, j, ai.getSupplyPointNum());
+                            }
                         }
                     }
-                }
-                if( numberDraw && ai != null && ai.getX(1) == reali && ai.getY(1) == realj ) {
-                    drawNumber(g, i, j, ""+ai.getId());
-                }
-                if( drawUnitHere(ai, reali, realj) ) {
-                    drawUnit(g, i, j, ai.getUnitType(), getColor(ai.getUnitOwner()), borderColor);
-                }
-                
-                if( adb.getId(reali+1, realj+1) == ai.getId() ) {
-                    drawLineBetween(g, reali, realj, reali+1, realj+1, getColor(ai));
-                }
-                if( adb.getId(reali+1, realj) == ai.getId() ) {
-                    drawLineBetween(g, reali, realj, reali+1, realj, getColor(ai));
-                }
-                if( adb.getId(reali+1, realj-1) == ai.getId() ) {
-                    drawLineBetween(g, reali, realj, reali+1, realj-1, getColor(ai));
-                }
-                if( adb.getId(reali, realj+1) == ai.getId() ) {
-                    drawLineBetween(g, reali, realj, reali, realj+1, getColor(ai));
-                }
-                if( adb.getId(reali, realj-1) == ai.getId() ) {
-                    drawLineBetween(g, reali, realj, reali, realj-1, getColor(ai));
-                }
-                
-                if( adb.getId(reali-1, realj+1) == ai.getId() ) {
-                    drawLineBetween(g, reali, realj, reali-1, realj+1, getColor(ai));
-                }
-                if( adb.getId(reali-1, realj) == ai.getId() ) {
-                    drawLineBetween(g, reali, realj, reali-1, realj, getColor(ai));
-                }
-                if( adb.getId(reali-1, realj-1) == ai.getId() ) {
-                    drawLineBetween(g, reali, realj, reali-1, realj-1, getColor(ai));
+                    if( numberDraw && ai != null && ai.getX(1) == reali && ai.getY(1) == realj ) {
+                        drawNumber(g, i, j, ""+ai.getId());
+                    }
+                    if( drawUnitHere(ai, reali, realj) ) {
+                        drawUnit(g, i, j, ai.getUnitType(), getColor(ai.getUnitOwner()), borderColor);
+                    }
+                    if( adb.getId(reali+1, realj+1) == ai.getId() ) {
+                        drawLineBetween(g, reali, realj, reali+1, realj+1, getColor(ai));
+                    }
+                    if( adb.getId(reali+1, realj) == ai.getId() ) {
+                        drawLineBetween(g, reali, realj, reali+1, realj, getColor(ai));
+                    }
+                    if( adb.getId(reali+1, realj-1) == ai.getId() ) {
+                        drawLineBetween(g, reali, realj, reali+1, realj-1, getColor(ai));
+                    }
+                    if( adb.getId(reali, realj+1) == ai.getId() ) {
+                        drawLineBetween(g, reali, realj, reali, realj+1, getColor(ai));
+                    }
+                    if( adb.getId(reali, realj-1) == ai.getId() ) {
+                        drawLineBetween(g, reali, realj, reali, realj-1, getColor(ai));
+                    }
+                    
+                    if( adb.getId(reali-1, realj+1) == ai.getId() ) {
+                        drawLineBetween(g, reali, realj, reali-1, realj+1, getColor(ai));
+                    }
+                    if( adb.getId(reali-1, realj) == ai.getId() ) {
+                        drawLineBetween(g, reali, realj, reali-1, realj, getColor(ai));
+                    }
+                    if( adb.getId(reali-1, realj-1) == ai.getId() ) {
+                        drawLineBetween(g, reali, realj, reali-1, realj-1, getColor(ai));
+                    }
                 }
             }
         }

@@ -19,6 +19,9 @@ public class Game  {
         players = new Vector<Player>();
     }
     
+    /** 
+     * Loads a game from a .emg file.
+     */
     public Game(String fileName) {
         this();
         try {

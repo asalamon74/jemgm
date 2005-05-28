@@ -100,6 +100,7 @@ public class Map  {
     public boolean processMapReportFormat(Game game, AreaDataBase adb, boolean headerProcess, boolean actual) {
         String line;
         
+        System.out.println("processMapReport");
         ParserState state = ParserState.NOT_STARTED;
         Vector<String> headLines  = new Vector<String>();
         PlayersRelation pr = null;
@@ -289,6 +290,7 @@ public class Map  {
             System.out.println("File read error: "+e2);
             return false;
         }
+        System.out.println("state:"+state);
         return state != ParserState.NOT_STARTED;
     }
     
@@ -387,6 +389,7 @@ public class Map  {
                 }
                 // after the header lines
                 if( headerProcess && adb.getXSize() == 0 ) {
+                    System.out.printf("hp [%d,%d]\n", xsize, ysize);
                     adb.init( xsize, ysize );
                 }
                 if( line.trim().matches("Subject: EMG: \\w* ColorMap Data File") ) {

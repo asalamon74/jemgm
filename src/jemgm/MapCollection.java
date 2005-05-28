@@ -4,33 +4,31 @@ import java.util.Vector;
 import java.io.*;
 
 /**
- * AODMapCollection.java
+ * MapCollection
  *
+ * Collection of map files. Used to store the different data and report files 
+ * sent by EMG server, or other players.
  *
- * Created: Fri Feb 15 20:57:14 2002
- *
- * @author Salamon Andras
- * @version
  */
 public class MapCollection  {
-
-    private Vector<Map> maps; 
+    
+    private Vector<Map> maps;
     private Game game;
-
+    
     public MapCollection(Game game) {
         maps = new Vector<Map>();
         setLatestTurn(0);
-	this.game = game;
+        this.game = game;
     }
-
+    
     public int getMapCount() {
         return maps.size();
     }
-
+    
     public Map getMap(int index) {
         return maps.elementAt(index);
     }
-
+    
     public void addMap(Map m) {
         maps.addElement(m);
         sort();
@@ -38,23 +36,23 @@ public class MapCollection  {
             setLatestTurn(m.getTurnNum());
         }
     }
-
+    
     public void deleteMap(int num) {
         maps.removeElementAt(num);
         if( maps.size() > 0 ) {
             setLatestTurn(maps.elementAt(0).getTurnNum());
         }
     }
-
+    
     public Map getLatestMap(Player p, int maxTurnNum) {
         int latest = -1;
         int index = -1;
         Map m;
         for( int i=0; i<maps.size(); ++i ) {
             m = maps.elementAt(i);
-            if( m.getPlayer().equals(p) && 
-                m.getTurnNum() > latest &&
-                m.getTurnNum() <= maxTurnNum) {
+            if( m.getPlayer().equals(p) &&
+                    m.getTurnNum() > latest &&
+                    m.getTurnNum() <= maxTurnNum) {
                 latest = m.getTurnNum();
                 index = i;
             }
@@ -64,11 +62,11 @@ public class MapCollection  {
         }
         return null;
     }
-
+    
     public Map getLatestMap(Player p) {
         return getLatestMap(p, Integer.MAX_VALUE);
     }
-
+    
     public Vector<Map> getLatestMaps(int maxTurnNum) {
         Vector<Map> latestMaps = new Vector<Map>();
         for( int i = 0; i<game.getPlayerNum(); ++i ) {
@@ -80,11 +78,11 @@ public class MapCollection  {
         }
         return latestMaps;
     }
-
+    
     public Vector getLatestMaps() {
         return getLatestMaps(Integer.MAX_VALUE);
     }
-
+    
     public String toString() {
         String ret="";
         for( int i = 0; i<maps.size(); ++i ) {
@@ -92,8 +90,8 @@ public class MapCollection  {
         }
         return ret;
     }
-
-
+    
+    
     private void sort() {
         int size = maps.size();
         Map lastMap = maps.elementAt(size-1);
@@ -107,9 +105,9 @@ public class MapCollection  {
             maps.removeElementAt(size-1);
             maps.insertElementAt(swap, index+1);
         }
-            
+        
     }
-
+    
     int latestTurn;
     
     /**
@@ -117,7 +115,7 @@ public class MapCollection  {
      * @return Value of latestTurn.
      */
     public int getLatestTurn() {
-         return latestTurn; 
+        return latestTurn;
     }
     
     /**
@@ -127,45 +125,45 @@ public class MapCollection  {
     private void setLatestTurn(int  v) {
         this.latestTurn = v;
     }
-
+    
     public AreaDataBase calculateAreaDatabase(int turnNum) {
-	return calculateAreaDatabase(turnNum, false);
+        return calculateAreaDatabase(turnNum, false);
     }
-
+    
     public AreaDataBase calculateAreaDatabase(int turnNum, boolean onlyMyMap) {
-	System.out.println("mapCollNum:"+getMapCount());
-	System.out.println("calculateAreaDatabase: "+turnNum);
+        System.out.println("mapCollNum:"+getMapCount());
+        System.out.println("calculateAreaDatabase: "+turnNum);
         Player actPlayer = game.getPlayer();
-	System.out.println("actPlayer:"+actPlayer.getNum());
+        System.out.println("actPlayer:"+actPlayer.getNum());
         Map m = getLatestMap(actPlayer, turnNum);
-	System.out.println("m:"+m);
+        System.out.println("m:"+m);
         FileInputStream fis = null;
-	AreaDataBase adb;
-	EmgGameParameters gt = game.getGameType();
-	if( gt.hasStaticMap() ) {
-	    adb = new AreaDataBase(game, gt.getMapSizeX(), gt.getMapSizeY(), gt.getMapHexFileName(), gt.getMapAreaFileName());
-	} else {
-	    adb = new AreaDataBase(game);
-	}
-
- 	AreaInformation ai269 = adb.getAreaInformation(269);
+        AreaDataBase adb;
+        EmgGameParameters gt = game.getGameType();
+        if( gt.hasStaticMap() ) {
+            adb = new AreaDataBase(game, gt.getMapSizeX(), gt.getMapSizeY(), gt.getMapHexFileName(), gt.getMapAreaFileName());
+        } else {
+            adb = new AreaDataBase(game);
+        }
+        
+        AreaInformation ai269 = adb.getAreaInformation(269);
         // my map
         boolean actual = true;
         int actturn = m.getTurnNum();
-	m.processMap(game, adb, true, actual);
-	System.out.println("my map processed");
-	ai269 = adb.getAreaInformation(269);
+        m.processMap(game, adb, true, actual);
+        System.out.println("my map processed");
+        ai269 = adb.getAreaInformation(269);
         // other maps
-	if( !onlyMyMap ) {
-	    Vector<Map> v = getLatestMaps(turnNum);
-	    for( int i=0; i<v.size(); ++i ) {
-		m = v.elementAt(i);
-		if( !m.getPlayer().equals(actPlayer) ) {
-		    actual = ( actturn ==  m.getTurnNum() );
-		    m.processMap(game, adb, false, actual);
-		}
-	    }        
-	}
+        if( !onlyMyMap ) {
+            Vector<Map> v = getLatestMaps(turnNum);
+            for( int i=0; i<v.size(); ++i ) {
+                m = v.elementAt(i);
+                if( !m.getPlayer().equals(actPlayer) ) {
+                    actual = ( actturn ==  m.getTurnNum() );
+                    m.processMap(game, adb, false, actual);
+                }
+            }
+        }
         return adb;
     }
     

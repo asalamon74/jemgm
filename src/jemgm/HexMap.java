@@ -16,16 +16,16 @@ import javax.swing.*;
  */
 
 public class HexMap extends JPanel implements MouseListener, MouseMotionListener {
-
+    
     Image capitalImage =  Toolkit.getDefaultToolkit().getImage( "images/capital.png" );
     
     public HexMap(Manager aodm) {
         addMouseListener(this);
         addMouseMotionListener(this);
         setAodm(aodm);
-	//	cc.setGame(aodm.getGame());
+        //	cc.setGame(aodm.getGame());
     }
-
+    
     Manager aodm;
     
     /**
@@ -33,7 +33,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
      * @return Value of aodm.
      */
     public Manager getAodm() {
-         return aodm; 
+        return aodm;
     }
     
     /**
@@ -42,9 +42,9 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
      */
     public void setAodm(Manager  v) {
         this.aodm = v;
-     }
+    }
     
-
+    
     AreaDataBase adb;
     
     /**
@@ -52,7 +52,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
      * @return Value of adb.
      */
     public AreaDataBase getAdb() {
-         return adb; 
+        return adb;
     }
     
     /**
@@ -65,8 +65,8 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         System.out.println("supply:"+adb.getSupplyPointNum(p));
         System.out.println("army:"+adb.getArmyStrength(p));
     }
-
-
+    
+    
     CommandCollection cc;// = new CommandCollection();
     
     /**
@@ -74,7 +74,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
      * @return Value of cc.
      */
     public CommandCollection getCc() {
-         return cc; 
+        return cc;
     }
     
     /**
@@ -85,20 +85,20 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         this.cc = v;
     }
     
-
+    
     public void paint(Graphics g) {
-        if( imageBuffer == null //|| 
-            //            imageBuffer.getWidth(null)  != getSize().width ||
-            //            imageBuffer.getHeight(null) != getSize().height ) {
-            && adb.getXSize() != 0
-            ) {
+        if( imageBuffer == null //||
+                //            imageBuffer.getWidth(null)  != getSize().width ||
+                //            imageBuffer.getHeight(null) != getSize().height ) {
+                && adb.getXSize() != 0
+                ) {
             int xsize = (int)(2*adb.getXSize()*xdiff);
             int ysize = (int)(2*adb.getYSize()*ydiff);
             imageBuffer = createImage(xsize, ysize);
             graphicsBuffer = imageBuffer.getGraphics();
             graphicsBuffer.setClip(0, 0, xsize, ysize);
             offScreen = true;
-                }
+        }
         if( offScreen ) {
             if( needRepaint ) {
                 realPaint(graphicsBuffer);
@@ -109,12 +109,12 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
             realPaint(g);
         }
     }
-
+    
     /**
      * This is the real paint method.
      */
     public void realPaint(Graphics g) {
-	System.out.println("realPaint");
+        System.out.println("realPaint");
         g.setColor(getBackground());
         g.fillRect(0, 0, (int)(2*adb.getXSize()*xdiff), (int)(2*adb.getYSize()*ydiff));
         g.setColor(borderColor);
@@ -137,59 +137,59 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
                     g.fillPolygon(xpoints, ypoints, 6);
                     g.setColor(borderColor);
                     g.drawPolygon(xpoints, ypoints, 6);
-                }                
-                if( supplyDraw && ai != null && ai.getX(1) == reali && ai.getY(1) == realj && 
-                    ai.getSupplyPointNum() != 0 ) {
-                    if( drawUnitHere(ai, reali, realj) || 
-                        drawNewUnitHere(ai, reali, realj)) {
-			if( ai.isCapital() ) {
-			    drawCapital(g, i, j, getColor(ai.getOwner()), false);
-			} else {
-			    drawSmallSupplyPoints(g, i, j, ai.getSupplyPointNum());
-			}
+                }
+                if( supplyDraw && ai != null && ai.getX(1) == reali && ai.getY(1) == realj &&
+                        ai.getSupplyPointNum() != 0 ) {
+                    if( drawUnitHere(ai, reali, realj) ||
+                            drawNewUnitHere(ai, reali, realj)) {
+                        if( ai.isCapital() ) {
+                            drawCapital(g, i, j, getColor(ai.getOwner()), false);
+                        } else {
+                            drawSmallSupplyPoints(g, i, j, ai.getSupplyPointNum());
+                        }
                     } else {
-			if( ai.isCapital() ) {
-			    drawCapital(g, i, j, getColor(ai.getOwner()), true);
-			} else {
-			    drawSupplyPoints(g, i, j, ai.getSupplyPointNum());
-			}
+                        if( ai.isCapital() ) {
+                            drawCapital(g, i, j, getColor(ai.getOwner()), true);
+                        } else {
+                            drawSupplyPoints(g, i, j, ai.getSupplyPointNum());
+                        }
                     }
                 }
                 if( numberDraw && ai != null && ai.getX(1) == reali && ai.getY(1) == realj ) {
                     drawNumber(g, i, j, ""+ai.getId());
-                }                        
-                if( drawUnitHere(ai, reali, realj) ) {
-                     drawUnit(g, i, j, ai.getUnitType(), getColor(ai.getUnitOwner()), borderColor);
                 }
-
-		if( adb.getId(reali+1, realj+1) == ai.getId() ) {
-		    drawLineBetween(g, reali, realj, reali+1, realj+1, getColor(ai));
-		}
-		if( adb.getId(reali+1, realj) == ai.getId() ) {
-		    drawLineBetween(g, reali, realj, reali+1, realj, getColor(ai));
-		}
-		if( adb.getId(reali+1, realj-1) == ai.getId() ) {
-		    drawLineBetween(g, reali, realj, reali+1, realj-1, getColor(ai));
-		}
-		if( adb.getId(reali, realj+1) == ai.getId() ) {
-		    drawLineBetween(g, reali, realj, reali, realj+1, getColor(ai));
-		}
-		if( adb.getId(reali, realj-1) == ai.getId() ) {
-		    drawLineBetween(g, reali, realj, reali, realj-1, getColor(ai));
-		}
-
-		if( adb.getId(reali-1, realj+1) == ai.getId() ) {
-		    drawLineBetween(g, reali, realj, reali-1, realj+1, getColor(ai));
-		}
-		if( adb.getId(reali-1, realj) == ai.getId() ) {
-		    drawLineBetween(g, reali, realj, reali-1, realj, getColor(ai));
-		}
-		if( adb.getId(reali-1, realj-1) == ai.getId() ) {
-		    drawLineBetween(g, reali, realj, reali-1, realj-1, getColor(ai));
-		}
+                if( drawUnitHere(ai, reali, realj) ) {
+                    drawUnit(g, i, j, ai.getUnitType(), getColor(ai.getUnitOwner()), borderColor);
+                }
+                
+                if( adb.getId(reali+1, realj+1) == ai.getId() ) {
+                    drawLineBetween(g, reali, realj, reali+1, realj+1, getColor(ai));
+                }
+                if( adb.getId(reali+1, realj) == ai.getId() ) {
+                    drawLineBetween(g, reali, realj, reali+1, realj, getColor(ai));
+                }
+                if( adb.getId(reali+1, realj-1) == ai.getId() ) {
+                    drawLineBetween(g, reali, realj, reali+1, realj-1, getColor(ai));
+                }
+                if( adb.getId(reali, realj+1) == ai.getId() ) {
+                    drawLineBetween(g, reali, realj, reali, realj+1, getColor(ai));
+                }
+                if( adb.getId(reali, realj-1) == ai.getId() ) {
+                    drawLineBetween(g, reali, realj, reali, realj-1, getColor(ai));
+                }
+                
+                if( adb.getId(reali-1, realj+1) == ai.getId() ) {
+                    drawLineBetween(g, reali, realj, reali-1, realj+1, getColor(ai));
+                }
+                if( adb.getId(reali-1, realj) == ai.getId() ) {
+                    drawLineBetween(g, reali, realj, reali-1, realj, getColor(ai));
+                }
+                if( adb.getId(reali-1, realj-1) == ai.getId() ) {
+                    drawLineBetween(g, reali, realj, reali-1, realj-1, getColor(ai));
+                }
             }
         }
-
+        
 //         // delete the line between hexes
 //         if( adb.getXSize() != 0) {
 //             for( int ainum = 1; ainum<adb.getXSize()*adb.getYSize(); ++ainum ) {
@@ -203,22 +203,22 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
 //                 }
 //             }
 //         }
-
+        
         // commands
         for( int i=0; cc != null && i<cc.getCommandNum(); ++i ) {
             Command c = cc.getCommand(i);
             if( c.getType().equals( CommandType.MO ) ||
-                c.getType().equals( CommandType.SA ) ||
-                c.getType().equals( CommandType.SD ) ||
-                c.getType().equals( CommandType.CO ) ) {
+                    c.getType().equals( CommandType.SA ) ||
+                    c.getType().equals( CommandType.SD ) ||
+                    c.getType().equals( CommandType.CO ) ) {
                 // draw command lines
                 Color arrowColor = c.getType().color;
                 // System.out.println("MOSASD "+c.getParam(0)+" "+c.getParam(1));
                 for( int pi=0; pi < c.getParamNum()-1; ++pi ) {
-		    if( !c.getType().equals( CommandType.CO ) && pi > 0) {
-			// only convoy command has more than 2 area parameters
-			break;			
-		    }
+                    if( !c.getType().equals( CommandType.CO ) && pi > 0) {
+                        // only convoy command has more than 2 area parameters
+                        break;
+                    }
                     if( c.getIntParam(pi+1) == 0 ) {
                         break;
                     }
@@ -230,7 +230,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
                     int ai1y = ai1.getY(1);
                     int ai2x = ai2.getX(1);
                     int ai2y = ai2.getY(1);
-                    // change the values if the other end is too far away.                
+                    // change the values if the other end is too far away.
                     if( Math.abs(ai2x - ai1x ) > adb.getXSize()/2 ) {
                         if( ai1x < ai2x ) {
                             ai1x = ai1x + adb.getXSize();
@@ -259,46 +259,46 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
                     drawArrowLine(g,(int)(x1+adb.getXSize()*xdiff),(int)(y1+adb.getYSize()*ydiff),(int)(x2+adb.getXSize()*xdiff),(int)(y2+adb.getYSize()*ydiff));
                 }
             } else if( c.getType() == CommandType.AA ||
-                       c.getType() == CommandType.AC ||
-                       c.getType() == CommandType.AF ||
-                       c.getType() == CommandType.AS ) {
+                    c.getType() == CommandType.AC ||
+                    c.getType() == CommandType.AF ||
+                    c.getType() == CommandType.AS ) {
                 int id = c.getIntParam(0);
                 AreaInformation cai = adb.getAreaInformation(id);
                 int unit=0;
                 if(  c.getType().equals(CommandType.AA ) ) {
-		    unit = Unit.ARMY.getId();
-		} else if(  c.getType().equals(CommandType.AC ) ) {
-		    unit = Unit.CORPS.getId();
-		} else if(  c.getType().equals(CommandType.AF ) ) {
-		    unit = Unit.FLEET.getId();
-		} else if(  c.getType().equals(CommandType.AS ) ) {
-		    unit = Unit.SQUANDRON.getId();
+                    unit = Unit.ARMY.getId();
+                } else if(  c.getType().equals(CommandType.AC ) ) {
+                    unit = Unit.CORPS.getId();
+                } else if(  c.getType().equals(CommandType.AF ) ) {
+                    unit = Unit.FLEET.getId();
+                } else if(  c.getType().equals(CommandType.AS ) ) {
+                    unit = Unit.SQUANDRON.getId();
                 }
                 int x1 = cai.getX(1);
                 int y1 = cai.getY(1);
                 if( !drawNewUnitHere(cai, x1, y1) ) {
                     x1 = cai.getX(2);
-                    y1 = cai.getY(2);                    
+                    y1 = cai.getY(2);
                 }
                 drawUnit(g, x1, y1, unit, getColor(cai.getOwner()), c.getType().color);
                 drawUnit(g, x1+adb.getXSize(), y1, unit, getColor(cai.getOwner()), c.getType().color);
                 drawUnit(g, x1, y1+adb.getYSize(), unit, getColor(cai.getOwner()), c.getType().color);
                 drawUnit(g, x1+adb.getXSize(), y1+adb.getYSize(), unit, getColor(cai.getOwner()), c.getType().color);
-
-            } else if( c.getType().equals(CommandType.UU) || 
-                       c.getType().equals(CommandType.DU) ||
-                       c.getType().equals(CommandType.RU) ) {
+                
+            } else if( c.getType().equals(CommandType.UU) ||
+                    c.getType().equals(CommandType.DU) ||
+                    c.getType().equals(CommandType.RU) ) {
                 int id = c.getIntParam(0);
                 AreaInformation cai = adb.getAreaInformation(id);
                 int unit=0;
                 if( c.getType().equals(CommandType.UU) ) {
                     if( cai.getUnitType() == Unit.CORPS.getId() ) {
-                        unit = Unit.ARMY.getId(); 
+                        unit = Unit.ARMY.getId();
                     } else if( cai.getUnitType() == Unit.SQUANDRON.getId() ) {
                         unit = Unit.FLEET.getId();
                     }
                 } else if( c.getType().equals(CommandType.DU) ||
-                           c.getType().equals(CommandType.RU) ) {
+                        c.getType().equals(CommandType.RU) ) {
                     unit = cai.getUnitType();
                 }
                 Color bColor = borderColor;
@@ -309,18 +309,18 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
                 int y1 = cai.getY(1);
                 if( !drawUnitHere(cai, x1, y1) ) {
                     x1 = cai.getX(2);
-                    y1 = cai.getY(2);                    
+                    y1 = cai.getY(2);
                 }
                 drawUnit(g, x1, y1, unit, getColor(cai.getOwner()), bColor, c.getType().color);
                 drawUnit(g, x1+adb.getXSize(), y1, unit, getColor(cai.getOwner()), bColor, c.getType().color);
                 drawUnit(g, x1, y1+adb.getYSize(), unit, getColor(cai.getOwner()), bColor, c.getType().color);
                 drawUnit(g, x1+adb.getXSize(), y1+adb.getYSize(), unit, getColor(cai.getOwner()), bColor, c.getType().color);
             } else if( c.getType().equals(CommandType.SP) ) {
-		System.out.println("paint spies "+c.getParamNum());
+                System.out.println("paint spies "+c.getParamNum());
                 for( int si=0; si<c.getParamNum(); ++si ) {
                     AreaInformation sai = adb.getAreaInformation(c.getIntParam(si));
                     if( sai != null ) {
-                        drawSpy( g, sai ); 
+                        drawSpy( g, sai );
                     } else if( c.getIntParam(si) != 0 ) {
                         int x = shift( (c.getIntParam(si) - 10000) / 100, adb.getXSize(), -aodm.getGame().getShiftX());
                         int y = shift( c.getIntParam(si) % 100, adb.getYSize(), -aodm.getGame().getShiftY());
@@ -330,54 +330,54 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
             }
         }
     }
-
+    
     public int shift(int raw, int size, int shift) {
         int ret = raw + shift;
         if( ret < 1 ) {
             ret += size;
-        } 
+        }
         if( ret > size ) {
             ret -= size;
         }
         return ret;
     }
-
+    
     private void drawArrowLine(Graphics g, int x1, int y1, int x2, int y2) {
         //        g.drawLine(x1,y1,x2,y2);
         //        g.fillOval((int)(x2-size/8),(int)(y2-size/8), (int)(size/4), (int)(size/4));
         DrawUtil.drawArrow(g, x1, y1, x2, y2);
     }
-
+    
     private boolean drawUnitHere(AreaInformation ai, int reali, int realj) {
-        return ai != null && ai.getUnitType() != 0 && 
-            ((ai.getX(1) == reali && ai.getY(1) == realj && ai.getX(2)==0) || 
-             (ai.getX(2) == reali && ai.getY(2) == realj));
+        return ai != null && ai.getUnitType() != 0 &&
+                ((ai.getX(1) == reali && ai.getY(1) == realj && ai.getX(2)==0) ||
+                (ai.getX(2) == reali && ai.getY(2) == realj));
     }
-
+    
     private boolean drawNewUnitHere(AreaInformation ai, int reali, int realj) {
-	if( cc == null ) {
-	    // no command collection
-	    return false;
-	}
+        if( cc == null ) {
+            // no command collection
+            return false;
+        }
         Command c = cc.getCommand(ai);
         return c != null &&
-            ( c.getType() == CommandType.AA ||
-              c.getType() == CommandType.AC ||
-              c.getType() == CommandType.AF ||
-              c.getType() == CommandType.AS ) &&
-            ai != null && 
-            ((ai.getX(1) == reali && ai.getY(1) == realj && ai.getX(2)==0) || 
-             (ai.getX(2) == reali && ai.getY(2) == realj));
+                ( c.getType() == CommandType.AA ||
+                c.getType() == CommandType.AC ||
+                c.getType() == CommandType.AF ||
+                c.getType() == CommandType.AS ) &&
+                ai != null &&
+                ((ai.getX(1) == reali && ai.getY(1) == realj && ai.getX(2)==0) ||
+                (ai.getX(2) == reali && ai.getY(2) == realj));
     }
-
+    
     private void drawLineBetween(Graphics g, int x1, int y1, int x2, int y2, Color c) {
         drawLineBetween(g, x1, y1, x2, y2, c, 1);
     }
-
+    
     private void drawLineBetween(Graphics g, int x1, int y1, int x2, int y2, Color c, int thickness) {
         int line = getAdjLine(x1, y1, x2, y2);
         double jj = y1 - (x1 % 2)*0.5;
-
+        
         if( line != 0 ) {
             g.setColor(c);
             for( int i=0;i<2; ++i ) {
@@ -388,33 +388,33 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
                     int ly1 = (int)(newtopy+yhex[line-1]+jj*ydiff);
                     int lx2 = (int)(newtopx+xhex[line % 6]+x1*xdiff);
                     int ly2 = (int)(newtopy+yhex[line % 6]+jj*ydiff);
-                        
+                    
                     if( thickness == 1 ) {
                         g.drawLine(lx1,ly1,lx2, ly2);
                     } else {
                         DrawUtil.drawThickLine(g, lx1, ly1, lx2, ly2,
-                                               thickness, g.getColor());
+                                thickness, g.getColor());
                     }
                 }
             }
         }
-
+        
     }
-
+    
     private void drawUnit(Graphics g, int i, int j, int unitId, Color c, Color bc) {
         drawUnit(g, i, j, unitId, c, bc, bc);
     }
-
-
+    
+    
     private void drawUnit(Graphics g, int i, int j, int unitId, Color c, Color bc, Color bc2) {
         double jj = j - (i % 2)*0.5;
         int x1 = (int)(topx-size*cos30+i*xdiff);
         int y1 = (int)(topy+jj*ydiff);
-
+        
         Unit unit = Unit.getUnit(unitId);
         unit.draw(g, x1, y1, size, (int)(3.0/4*size), c, bc, bc2);
     }
-
+    
     private void drawSpy(Graphics g, Area a) {
         drawSpyOne(g, a.getX(1), a.getY(1) );
         if( a.getX(2) != 0 ) {
@@ -424,23 +424,23 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
             drawSpyOne(g, a.getX(3), a.getY(3) );
         }
     }
-
+    
     private void drawSpyOne(Graphics g, int i, int j) {
         drawSpyOneReal(g,i,j);
         drawSpyOneReal(g,i+adb.getXSize(),j);
         drawSpyOneReal(g,i,j+adb.getYSize());
-        drawSpyOneReal(g,i+adb.getXSize(),j+adb.getYSize());        
+        drawSpyOneReal(g,i+adb.getXSize(),j+adb.getYSize());
     }
-
-
+    
+    
     private void drawSpyOneReal(Graphics g, int i, int j) {
         double jj = j - (i % 2)*0.5;
         int x1 = (int)(topx-2*size*cos30+i*xdiff);
         int y1 = (int)(topy+jj*ydiff-0.5*ydiff);
-
+        
         g.drawImage(spyImage, x1, y1, null);
     }
- 
+    
     private void drawNumber(Graphics g, int i, int j, String text) {
         double jj = j - (i % 2)*0.5;
         int x = (int)(topx-size*cos30+i*xdiff);
@@ -448,7 +448,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         g.setFont(new Font("Dialog", Font.PLAIN, (int)(size/2)));
         g.drawString(text, x, y);
     }
-
+    
     /**
      * Draws small size of supply points.
      */
@@ -465,7 +465,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
             x += 1.2 * smallSupplySize;
         }
     }
-
+    
     /**
      * Draws normal size of supply points.
      */
@@ -481,33 +481,33 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
             DrawUtil.drawThickLine(g,(int)(x + supplySize/4), (int)(y+supplySize/2), (int)(x+3*supplySize/4), (int)(y+supplySize/2), 1, g.getColor());
             x += 1.2 * supplySize;
         }
-    } 
-
+    }
+    
     /**
      * Draws the capital image.
      */
     private void drawCapital(Graphics g, int i, int j, Color c, boolean normalSize) {
-	Color oldColor = g.getColor();
+        Color oldColor = g.getColor();
         double jj = j - (i % 2)*0.5;
-	int x1;
-	int y1;
-	double ratio = 1;
-	if( normalSize ) {
-	    x1 = (int)(topx-size*cos30+i*xdiff);
-	    y1 = (int)(topy+jj*ydiff);	    
-	} else {
-	    x1 = (int)(topx-0.75*size*cos30+i*xdiff);
-	    y1 = (int)(topy+jj*ydiff-3.0/8*size);
-	    ratio = 2.0/3;
-	}
-
-	g.setColor(c);
-	g.fillRect( x1, y1, (int)(size*ratio), (int)(3.0/4*size*ratio) );          
-	g.drawImage(capitalImage, x1, y1, (int)(size*ratio), (int)(3.0/4*size*ratio), null);
-	g.setColor(oldColor);
+        int x1;
+        int y1;
+        double ratio = 1;
+        if( normalSize ) {
+            x1 = (int)(topx-size*cos30+i*xdiff);
+            y1 = (int)(topy+jj*ydiff);
+        } else {
+            x1 = (int)(topx-0.75*size*cos30+i*xdiff);
+            y1 = (int)(topy+jj*ydiff-3.0/8*size);
+            ratio = 2.0/3;
+        }
+        
+        g.setColor(c);
+        g.fillRect( x1, y1, (int)(size*ratio), (int)(3.0/4*size*ratio) );
+        g.drawImage(capitalImage, x1, y1, (int)(size*ratio), (int)(3.0/4*size*ratio), null);
+        g.setColor(oldColor);
     }
-
-
+    
+    
 //     private void drawArea(Graphics g, AreaInformation a, Color c, int thickness) {
 //         int x,y;
 //         for( int i=1; i<= a.getSize(); ++i ) {
@@ -531,12 +531,12 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
 //             drawLineBetween(g, a.getX(1), a.getY(1), a.getX(3), a.getY(3), getColor(a), 2);
 //         }
 //     }
-
+    
     private Color getColor(AreaInformation ai) {
         if( ai == null ) {
             return unknownColor;
-        } else if( ai.getAreaType() == Area.AREA_TYPE_LAND 
-		   || ai.getAreaType() == Area.AREA_TYPE_COSTAL) {
+        } else if( ai.getAreaType() == Area.AREA_TYPE_LAND
+                || ai.getAreaType() == Area.AREA_TYPE_COSTAL) {
             if( ai.getOwner() == -1 ) {
                 return unknownColor;
             }
@@ -546,12 +546,12 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         }
         return unknownColor;
     }
-
+    
     private Color getColor(int playerNum) {
-        //return playerColors[playerNum % playerColors.length];        
-	return Colors.getInstance(aodm.getGame()).getPlayerColor(playerNum);
+        //return playerColors[playerNum % playerColors.length];
+        return Colors.getInstance(aodm.getGame()).getPlayerColor(playerNum);
     }
-
+    
     private int getAdjLine(int x1, int y1, int x2, int y2) {
         int ydiff = y2-y1;
         if( ydiff == adb.getYSize()-1 ) {
@@ -559,19 +559,19 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         } else if( ydiff == -(adb.getYSize()-1) ) {
             ydiff = 1;
         }
-
+        
         int xdiff = (x2-x1);
         if( xdiff == adb.getXSize()-1 ) {
             xdiff = -1;
         } else if( xdiff == -(adb.getXSize() -1) ) {
             xdiff = 1;
         }
-
+        
         if( Math.abs(ydiff) > 1 || Math.abs(xdiff) > 1) {
             return 0;
         }
-
-        if( ydiff == 0 ) { // same row          
+        
+        if( ydiff == 0 ) { // same row
             if( xdiff == 1 ) {
                 return (x1 % 2) + 1;
             } else if( xdiff == -1 ) {
@@ -598,14 +598,14 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         }
         return 0;
     }
-
+    
     public void update(Graphics g) {
         paint(g);
-    }    
-
+    }
+    
     public void mouseClicked(java.awt.event.MouseEvent evt) {
     }
-
+    
     public void mousePressed(java.awt.event.MouseEvent evt) {
         if( (evt.getModifiers() & evt.BUTTON2_MASK) != 0 ) {
             dragStartX = evt.getX();
@@ -624,16 +624,16 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
             }
         }
     }
-
+    
     public void mouseReleased(java.awt.event.MouseEvent evt) {
     }
-
+    
     public void mouseEntered(java.awt.event.MouseEvent evt) {
     }
-
+    
     public void mouseExited(java.awt.event.MouseEvent evt) {
     }
-
+    
     public void mouseDragged(java.awt.event.MouseEvent evt) {
         if( (evt.getModifiers() & evt.BUTTON2_MASK) != 0 ) {
             offX -= evt.getX() - dragStartX;
@@ -653,23 +653,23 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
             repaint();
         }
     }
-
+    
     public void mouseMoved(java.awt.event.MouseEvent evt) {
         updateStatusLabel(getAreaPlace(evt.getX(), evt.getY()));
     }
-
+    
     public Dimension getAreaPlace(int x, int y) {
         int xx = x+offX;
         int yy = y+offY;
         int minxx=0;
         int minyy=0;
-
+        
         if( adb.getXSize()*xdiff > 0 ) {
             xx %= (int)(adb.getXSize()*xdiff);
             yy %= (int)(adb.getYSize()*ydiff);
             int xxp = (int)(xx /xdiff);
             int yyp = (int)(yy /ydiff);
-
+            
             // the area is somowhere close to xi, yi
             int mindiff=Integer.MAX_VALUE;
             for( int xi=xxp-2; xi<xxp+3; ++xi ) {
@@ -699,11 +699,11 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         }
         return new Dimension(minxx,minyy);
     }
-
+    
     public void updateStatusLabel(Dimension d) {
         if( adb.getXSize() != 0 ) {
             AreaInformation ai = adb.getAreaInformation(adb.getId(d.width,d.height));
-            if( ai != null ) {               
+            if( ai != null ) {
                 String statusStr = "Area ["+d.width+","+d.height+"] = "+ai.getId()+" Player: ";
                 if( ai.getOwner() == -1 ) {
                     statusStr += "Unknown";
@@ -716,82 +716,82 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
                 if( ai.getSupplyPointNum() > 0 ) {
                     statusStr += " Supply Points: "+ai.getSupplyPointNum();
                 }
-		if( cc != null ) {
-		    Command c = cc.getCommand(ai);
-		    if( c != null ) {
-			System.out.println("c:"+c);
-			statusStr += " ["+c.toHumanReadableString()+"]";
-		    }
-		}
+                if( cc != null ) {
+                    Command c = cc.getCommand(ai);
+                    if( c != null ) {
+                        System.out.println("c:"+c);
+                        statusStr += " ["+c.toHumanReadableString()+"]";
+                    }
+                }
                 getAodm().setStatusLabel(statusStr);
                 return;
             }
             getAodm().setStatusLabel("Area ["+d.width+","+d.height+"]");
         }
     }
-
-    /** 
+    
+    /**
      * Changes the offset, so the area will be somewhere int the middle
      */
     public void center(int x, int y) {
         int wxsize = (int)getSize().width;
         int wysize = (int)getSize().height;
-
+        
         offX = (int)((x-1)*xdiff - wxsize/2);
         offY = (int)((y-1)*ydiff - wysize/2);
-
+        
         if( offX < 2*size ) {
             offX += adb.getXSize()*xdiff;
         }
-
+        
         if( offY < 2*size ) {
             offY += adb.getYSize()*ydiff;
         }
-
-        repaint();           
+        
+        repaint();
     }
-
+    
     public static final Color borderColor  = Color.black;
     public static final Color seaColor     = Color.cyan;
     public static final Color unknownColor = Color.lightGray;
-
+    
 //     public static final Color playerColors[] = {
 //         Color.white, Color.red, Color.pink, Color.orange, Color.yellow,Color.magenta,
 //     new Color(150,150, 255), new Color(255, 100, 100), new Color(100,255,100), Color.green, new Color(240,240,100), new Color(70,70, 170), new Color(170,70,70) };
-
-
+    
+    
     public static final double sin30 = Math.sin(30.0/180*2*Math.PI);
-    public static final double cos30 = 0.5; 
+    public static final double cos30 = 0.5;
     public static final int size = 32;
     public static final double supplySize = size/2;
     public static final double smallSupplySize = size/3;
     public static final double xdiff = (1+cos30)*size;
     public static final double ydiff = 2*sin30*size;
-
+    
     public static final double xhex[] = {
         size*cos30,size,size*cos30,-size*cos30,-size,-size*cos30};
-
-    public static final double yhex[] = {
-        -size*sin30,0,+size*sin30,size*sin30,0,-size*sin30};
-
-
-    public static final int topx=-size;
-    public static final int topy=-size;
-
-    public static final boolean numberDraw = true;
-    public static final boolean supplyDraw = true;
-
-    private boolean  offScreen = false;
-    private Image    imageBuffer;
-    private Graphics graphicsBuffer;
-    public  boolean  needRepaint = true;
-
-    private int dragStartX;
-    private int dragStartY;
-    private int offX = size;
-    private int offY = size;
-
-    protected Image spyImage = Toolkit.getDefaultToolkit().getImage( 
-        this.getClass().getResource( "/images/spy.png" ));
-
+        
+        public static final double yhex[] = {
+            -size*sin30,0,+size*sin30,size*sin30,0,-size*sin30};
+            
+            
+            public static final int topx=-size;
+            public static final int topy=-size;
+            
+            public static final boolean numberDraw = true;
+            public static final boolean supplyDraw = true;
+            
+            private boolean  offScreen = false;
+            private Image    imageBuffer;
+            private Graphics graphicsBuffer;
+            public  boolean  needRepaint = true;
+            
+            private int dragStartX;
+            private int dragStartY;
+            private int offX = size;
+            private int offY = size;
+            
+            protected Image spyImage = Toolkit.getDefaultToolkit().getImage(
+                    this.getClass().getResource( "/images/spy.png" ));
+            
 } // HexMap

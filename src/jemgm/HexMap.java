@@ -82,6 +82,8 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
     
     
     public void paint(Graphics g) {
+        grW = getWidth();
+        grH = getHeight();
         if( imageBuffer == null && adb.getXSize() != 0 ) {
             int xsize = (int)(2*adb.getXSize()*xdiff);
             int ysize = (int)(2*adb.getYSize()*ydiff);
@@ -109,9 +111,13 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         g.fillRect(0, 0, (int)(2*adb.getXSize()*xdiff), (int)(2*adb.getYSize()*ydiff));
         g.setColor(borderColor);
         
+        ySize = adb.getYSize();
+        if( aodm.getGame() != null && aodm.getGame().getGameType().wordWrapY() ) {
+            ySize *= 2;
+        }
         // main loop to draw the board
         for( int i=1; i<=2*adb.getXSize(); ++i ) {
-            for( int j=1; j<=2*adb.getYSize(); ++j ) {
+            for( int j=1; j<=ySize; ++j ) {
                 int reali = ((i-1) % adb.getXSize()) + 1;
                 int realj = ((j-1) % adb.getYSize()) + 1;
                 int xpoints[] = new int[6];
@@ -332,7 +338,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         }
         return ret;
     }
-
+    
     /**
      * Draws an arrow. Used for drawing MO,SA,SD,... commands.
      */
@@ -656,10 +662,19 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
             } else if( offX < 2*size ) {
                 offX += adb.getXSize()*xdiff;
             }
-            if( offY > 2*size+adb.getYSize()*ydiff ) {
-                offY -= adb.getYSize()*ydiff;
-            } else if( offY < 2*size ) {
-                offY += adb.getYSize()*ydiff;
+            if( aodm.getGame().getGameType().wordWrapY() ) {
+                if( offY > 2*size+adb.getYSize()*ydiff ) {
+                    offY -= adb.getYSize()*ydiff;
+                } else if( offY < size ) {
+                    offY += adb.getYSize()*ydiff;
+                }
+            } else {
+                if( offY < 0 ) {
+                    offY = 0;
+                }
+                if( offY > ySize * ydiff - grH) {
+                    offY = (int)(ySize * ydiff - grH);
+                }
             }
             repaint();
         }
@@ -711,6 +726,10 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         return new Dimension(minxx,minyy);
     }
     
+    /** 
+     * Updates the status label.
+     * Shows information about the current area.
+     */
     public void updateStatusLabel(Dimension d) {
         if( adb.getXSize() != 0 ) {
             AreaInformation ai = adb.getAreaInformation(adb.getId(d.width,d.height));
@@ -770,7 +789,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
 //         Color.white, Color.red, Color.pink, Color.orange, Color.yellow,Color.magenta,
 //     new Color(150,150, 255), new Color(255, 100, 100), new Color(100,255,100), Color.green, new Color(240,240,100), new Color(70,70, 170), new Color(170,70,70) };
     
-    
+    // precalculated constants
     public static final double sin30 = Math.sin(30.0/180*2*Math.PI);
     public static final double cos30 = 0.5;
     public static final int size = 32;
@@ -779,30 +798,32 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
     public static final double xdiff = (1+cos30)*size;
     public static final double ydiff = 2*sin30*size;
     
-    public static final double xhex[] = {
-        size*cos30,size,size*cos30,-size*cos30,-size,-size*cos30};
-        
-        public static final double yhex[] = {
-            -size*sin30,0,+size*sin30,size*sin30,0,-size*sin30};
-            
-            
-            public static final int topx=-size;
-            public static final int topy=-size;
-            
-            public static final boolean numberDraw = true;
-            public static final boolean supplyDraw = true;
-            
-            private boolean  offScreen = false;
-            private Image    imageBuffer;
-            private Graphics graphicsBuffer;
-            public  boolean  needRepaint = true;
-            
-            private int dragStartX;
-            private int dragStartY;
-            private int offX = size;
-            private int offY = size;
-            
-            protected Image spyImage = Toolkit.getDefaultToolkit().getImage(
-                    this.getClass().getResource( "/images/spy.png" ));
-            
+    public static final double xhex[] = {size*cos30,size,size*cos30,-size*cos30,-size,-size*cos30};
+    
+    public static final double yhex[] = {-size*sin30,0,+size*sin30,size*sin30,0,-size*sin30};
+    
+    
+    public static final int topx=-size;
+    public static final int topy=-size;
+    
+    public static final boolean numberDraw = true;
+    public static final boolean supplyDraw = true;
+    
+    private boolean  offScreen = false;
+    private Image    imageBuffer;
+    private Graphics graphicsBuffer;
+    public  boolean  needRepaint = true;
+    
+    private int dragStartX;
+    private int dragStartY;
+    private int offX = size;
+    private int offY = size;
+    private int xSize;
+    private int ySize;
+    private int grW;
+    private int grH;
+    
+    protected Image spyImage = Toolkit.getDefaultToolkit().getImage(
+            this.getClass().getResource( "/images/spy.png" ));
+    
 } // HexMap

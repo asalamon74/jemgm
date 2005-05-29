@@ -180,19 +180,19 @@ public class AreaDataBase  {
 	    } else if( ai.getUnitType() == 0 ) {
 		ai.setUnitType(a.getUnitType());
 	    }
-            if( game.getGameType().hasFogOfWar() && ai.getOwner() != -1 && a.getOwner() != -1
+            if( game.getGameType().hasNeutralAndUnknown() && ai.getOwner() != -1 && a.getOwner() != -1
 		&& ai.getOwner() != a.getOwner() ) {
 		System.out.println("Invalid owner (fogofwar): "+ai.getId());
 	        System.out.println("ai.getOwner:"+ai.getOwner());
 	        System.out.println("a.getOwner:"+a.getOwner());
-	    } else if( !game.getGameType().hasFogOfWar() && ai.getOwner() != 0 && a.getOwner() != 0
+	    } else if( !game.getGameType().hasNeutralAndUnknown() && ai.getOwner() != 0 && a.getOwner() != 0
 		       && ai.getOwner() != a.getOwner() ) {
 		System.out.println("Invalid owner (no fogofwar): "+ai.getId());
 	        System.out.println("ai.getOwner:"+ai.getOwner());
 	        System.out.println("a.getOwner:"+a.getOwner());
-	    } else if( game.getGameType().hasFogOfWar() && ai.getOwner() == -1 ) {
+	    } else if( game.getGameType().hasNeutralAndUnknown() && ai.getOwner() == -1 ) {
 		ai.setOwner(a.getOwner());
-	    } else if( !game.getGameType().hasFogOfWar() && ai.getOwner() == 0 ) {
+	    } else if( !game.getGameType().hasNeutralAndUnknown() && ai.getOwner() == 0 ) {
 		ai.setOwner(a.getOwner());
 	    }
 

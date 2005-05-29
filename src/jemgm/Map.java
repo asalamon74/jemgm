@@ -100,8 +100,11 @@ public class Map  {
     public boolean processMapReportFormat(Game game, AreaDataBase adb, PlayersRelation pr, boolean headerProcess, boolean actual) {
         String line;
         
-        System.out.println("processMapReport");
+        System.out.println("processMapReport");        
         ParserState state = ParserState.NOT_STARTED;
+        if( !headerProcess ) {
+            state = ParserState.AREA;
+        }
         Vector<String> headLines  = new Vector<String>();
         int plNum=0;
         
@@ -382,7 +385,11 @@ public class Map  {
                 } else if( lineNum < 6 && !headerProcess) {
                     // skip the header
                     while( !line.startsWith("Number of Areas" ) ) {
-                        line = fin.readLine();
+                        if( (line = fin.readLine()) == null ) {
+                            // end of file before number of areas line
+                            // not data file format
+                            return false;
+                        }
                     }
                     line = fin.readLine();
                     lineNum = 6;

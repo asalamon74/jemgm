@@ -88,7 +88,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
             int xsize = (int)(2*adb.getXSize()*xdiff);
             int ysize = (int)(2*adb.getYSize()*ydiff);
             imageBuffer = createImage(xsize, ysize);
-            graphicsBuffer = imageBuffer.getGraphics();
+            graphicsBuffer = (Graphics2D)imageBuffer.getGraphics();
             graphicsBuffer.setClip(0, 0, xsize, ysize);
             offScreen = true;
         }
@@ -99,14 +99,21 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
             }
             g.drawImage(imageBuffer, -offX, -offY, this);
         } else {
-            realPaint(g);
+            realPaint((Graphics2D)g);
         }
     }
     
     /**
      * This is the real paint method.
      */
-    public void realPaint(Graphics g) {
+    public void realPaint(Graphics2D g) {
+
+        if( adb.getXSize() == 0 ) {
+            // not yet initializes
+            return;
+        }
+        PlayersRelation plr = aodm.getTurn(aodm.getActTurnNumber()).getPr();
+        
         g.setColor(getBackground());
         g.fillRect(0, 0, (int)(2*adb.getXSize()*xdiff), (int)(2*adb.getYSize()*ydiff));
         g.setColor(borderColor);
@@ -158,36 +165,32 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
                     if( drawUnitHere(ai, reali, realj) ) {
                         drawUnit(g, i, j, ai.getUnitType(), getColor(ai.getUnitOwner()), borderColor);
                     }
-                    if( adb.getId(reali+1, realj+1) == ai.getId() ) {
-                        drawLineBetween(g, reali, realj, reali+1, realj+1, getColor(ai));
-                    }
-                    if( adb.getId(reali+1, realj) == ai.getId() ) {
-                        drawLineBetween(g, reali, realj, reali+1, realj, getColor(ai));
-                    }
-                    if( adb.getId(reali+1, realj-1) == ai.getId() ) {
-                        drawLineBetween(g, reali, realj, reali+1, realj-1, getColor(ai));
-                    }
-                    if( adb.getId(reali, realj+1) == ai.getId() ) {
-                        drawLineBetween(g, reali, realj, reali, realj+1, getColor(ai));
-                    }
-                    if( adb.getId(reali, realj-1) == ai.getId() ) {
-                        drawLineBetween(g, reali, realj, reali, realj-1, getColor(ai));
-                    }
-                    
-                    if( adb.getId(reali-1, realj+1) == ai.getId() ) {
-                        drawLineBetween(g, reali, realj, reali-1, realj+1, getColor(ai));
-                    }
-                    if( adb.getId(reali-1, realj) == ai.getId() ) {
-                        drawLineBetween(g, reali, realj, reali-1, realj, getColor(ai));
-                    }
-                    if( adb.getId(reali-1, realj-1) == ai.getId() ) {
-                        drawLineBetween(g, reali, realj, reali-1, realj-1, getColor(ai));
+                    // delete the lines between the hexes, if they are in the same area.
+                    for( int ni=-1; ni<=1; ++ni) {
+                        for( int nj=-1; nj<=1; ++nj ) {
+                            if( ni == 0 && nj == 0) { 
+                                continue;
+                            }
+                            int nri = ((reali+ni-1) % adb.getXSize())+1;
+                            int nrj = ((realj+nj-1) % adb.getYSize())+1;
+                            if( adb.getId(nri, nrj) == ai.getId() ) {
+                                drawLineBetween(g, reali, realj, nri, nrj, getColor(ai));
+                            }
+                            AreaInformation nai = adb.getAreaInformation(adb.getId(nri, nrj));
+                            if( showFrontLines && nai != null && ai.getOwner() >= 1 && nai.getOwner() >= 1 &&
+                                    plr.getSimpleRelation(ai.getOwner(), nai.getOwner()) == PlayersRelation.RelationType.WAR) {
+                                drawLineBetween(g, reali, realj, nri, nrj, frontLineColor, frontLineStroke);
+                            }
+                            if( showFrontLines && nai != null && ai.getOwner() >= 1 && nai.getOwner() >= 1 &&
+                                    plr.getSimpleRelation(ai.getOwner(), nai.getOwner()) == PlayersRelation.RelationType.ALLY) {
+                                drawLineBetween(g, reali, realj, nri, nrj, friendlyLineColor, frontLineStroke);
+                            }
+                        }
                     }
                 }
             }
         }
         
-//         // delete the line between hexes
 //         if( adb.getXSize() != 0) {
 //             for( int ainum = 1; ainum<adb.getXSize()*adb.getYSize(); ++ainum ) {
 //                 AreaInformation ai = adb.getAreaInformation(ainum);
@@ -368,15 +371,19 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
                 (ai.getX(2) == reali && ai.getY(2) == realj));
     }
     
-    private void drawLineBetween(Graphics g, int x1, int y1, int x2, int y2, Color c) {
-        drawLineBetween(g, x1, y1, x2, y2, c, 1);
+    private void drawLineBetween(Graphics2D g, int x1, int y1, int x2, int y2, Color c) {
+        drawLineBetween(g, x1, y1, x2, y2, c, thickLineStroke);
     }
-    
-    private void drawLineBetween(Graphics g, int x1, int y1, int x2, int y2, Color c, int thickness) {
+   
+    private void drawLineBetween(Graphics2D g, int x1, int y1, int x2, int y2, Color c, Stroke stroke) {
         int line = getAdjLine(x1, y1, x2, y2);
+        if( x1 == 31 && y1 == 26) {
+            System.out.printf("x2: %d y2: %d line: %d\n", x2, y2, line);
+        }
         double jj = y1 - (x1 % 2)*0.5;
-        
+                
         if( line != 0 ) {
+            Stroke oldStroke = g.getStroke();
             g.setColor(c);
             for( int i=0;i<2; ++i ) {
                 for( int j=0; j<2; ++j ) {
@@ -386,15 +393,19 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
                     int ly1 = (int)(newtopy+yhex[line-1]+jj*ydiff);
                     int lx2 = (int)(newtopx+xhex[line % 6]+x1*xdiff);
                     int ly2 = (int)(newtopy+yhex[line % 6]+jj*ydiff);
-                    
+
+                    /*
                     if( thickness == 1 ) {
                         g.drawLine(lx1,ly1,lx2, ly2);
                     } else {
-                        DrawUtil.drawThickLine(g, lx1, ly1, lx2, ly2,
-                                thickness, g.getColor());
+                        DrawUtil.drawThickLine(g, lx1, ly1, lx2, ly2, thickness, g.getColor());
                     }
+                    */
+                    g.setStroke(stroke);
+                    g.drawLine(lx1,ly1,lx2, ly2);
                 }
             }
+            g.setStroke(oldStroke);
         }
         
     }
@@ -781,9 +792,11 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         repaint();
     }
     
-    public static final Color borderColor  = Color.black;
-    public static final Color seaColor     = Color.cyan;
-    public static final Color unknownColor = Color.lightGray;
+    public static final Color borderColor       = Color.black;
+    public static final Color seaColor          = Color.cyan;
+    public static final Color unknownColor      = Color.lightGray;
+    public static final Color frontLineColor    = Color.red;
+    public static final Color friendlyLineColor = Color.green;
     
 //     public static final Color playerColors[] = {
 //         Color.white, Color.red, Color.pink, Color.orange, Color.yellow,Color.magenta,
@@ -808,10 +821,12 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
     
     public static final boolean numberDraw = true;
     public static final boolean supplyDraw = true;
+
+    private boolean showFrontLines = true;
     
     private boolean  offScreen = false;
     private Image    imageBuffer;
-    private Graphics graphicsBuffer;
+    private Graphics2D graphicsBuffer;
     public  boolean  needRepaint = true;
     
     private int dragStartX;
@@ -822,8 +837,20 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
     private int ySize;
     private int grW;
     private int grH;
+
+    private float[] dash = {5};
+    private BasicStroke frontLineStroke = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1f, dash, 0);
+    private BasicStroke thickLineStroke = new BasicStroke(1);
     
     protected Image spyImage = Toolkit.getDefaultToolkit().getImage(
             this.getClass().getResource( "/images/spy.png" ));
+
+    public boolean isShowFrontLines() {
+        return showFrontLines;
+    }
+
+    public void setShowFrontLines(boolean showFrontLines) {
+        this.showFrontLines = showFrontLines;
+    }
     
 } // HexMap

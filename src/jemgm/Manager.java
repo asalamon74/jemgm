@@ -80,9 +80,11 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         optionsMenu = new JMenu("Options");
         unitImagesMenuItem = new JCheckBoxMenuItem("Unit Images", true);
         Unit.setShowUnitImages(unitImagesMenuItem.getState());
+        frontLinesMenuItem = new JCheckBoxMenuItem("Show frontline");
         colorsMenuItem = new JMenuItem("Colors");
         emailMenuItem = new JMenuItem("Emails");
         optionsMenu.add(unitImagesMenuItem);
+        optionsMenu.add(frontLinesMenuItem);
         optionsMenu.add(colorsMenuItem);
         optionsMenu.addSeparator();
         optionsMenu.add(emailMenuItem);
@@ -114,6 +116,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         validateMenuItem.addActionListener(this);
         sendMenuItem.addActionListener(this);
         unitImagesMenuItem.addItemListener(this);
+        frontLinesMenuItem.addItemListener(this);
         colorsMenuItem.addActionListener(this);
         emailMenuItem.addActionListener(this);
         
@@ -214,9 +217,11 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         if( source.equals(unitImagesMenuItem) ) {
             Unit.setShowUnitImages(unitImagesMenuItem.getState());
             map.needRepaint = true;
-            map.repaint();
-            validate();
+        } else if ( source.equals(frontLinesMenuItem) ){
+            map.setShowFrontLines(frontLinesMenuItem.getState());
         }
+        map.repaint();
+        validate();        
     }
     
     class PopupListener extends MouseAdapter {
@@ -482,6 +487,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         try {
             BufferedWriter propsOut = new BufferedWriter(new FileWriter(dirName + "properties"));
             propsOut.write("unitImages: "+unitImagesMenuItem.getState()+"\n");
+            propsOut.write("frontLines: "+frontLinesMenuItem.getState()+"\n");
             propsOut.write("bccSelf: "+bccSelf+"\n");
             for (Enumeration e = recents.elements() ; e.hasMoreElements() ;) {
                 propsOut.write("recent:"+e.nextElement()+"\n");
@@ -509,6 +515,14 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
                         unitImagesMenuItem.setState(true);
                     }
                     Unit.setShowUnitImages(unitImagesMenuItem.getState());
+                } else if( line.startsWith("frontLines:") ) {
+                    // not too nice
+                    if( line.indexOf("false") > -1 ) {
+                        frontLinesMenuItem.setState(false);
+                    } else {
+                        frontLinesMenuItem.setState(true);
+                    }
+                    map.setShowFrontLines(frontLinesMenuItem.getState());
                 } else if( line.startsWith("recent:") ) {
                     recents.add(line.substring("recent:".length()));
                     JMenuItem recentItem = new JMenuItem(line.substring("recent:".length()));
@@ -993,6 +1007,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
     private JMenuItem cancelMenuItem;
     private JMenu     optionsMenu;
     private JCheckBoxMenuItem unitImagesMenuItem;
+    private JCheckBoxMenuItem frontLinesMenuItem;
     private JMenuItem colorsMenuItem;
     private JMenuItem emailMenuItem;
     private JPanel    commandPanel;

@@ -6,13 +6,9 @@ import java.awt.event.MouseMotionListener;
 import javax.swing.*;
 
 /**
- * HexMap.java
+ * HexMap.
  *
- *
- * Created: Mon Feb 18 17:27:04 2002
- *
- * @author Salamon Andras
- * @version
+ * The most important part of the screen. It shows the map, the commands...
  */
 
 public class HexMap extends JPanel implements MouseListener, MouseMotionListener {
@@ -23,7 +19,6 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         addMouseListener(this);
         addMouseMotionListener(this);
         setAodm(aodm);
-        //	cc.setGame(aodm.getGame());
     }
     
     Manager aodm;
@@ -67,7 +62,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
     }
     
     
-    CommandCollection cc;// = new CommandCollection();
+    CommandCollection cc;
     
     /**
      * Get the value of cc.
@@ -87,11 +82,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
     
     
     public void paint(Graphics g) {
-        if( imageBuffer == null //||
-                //            imageBuffer.getWidth(null)  != getSize().width ||
-                //            imageBuffer.getHeight(null) != getSize().height ) {
-                && adb.getXSize() != 0
-                ) {
+        if( imageBuffer == null && adb.getXSize() != 0 ) {
             int xsize = (int)(2*adb.getXSize()*xdiff);
             int ysize = (int)(2*adb.getYSize()*ydiff);
             imageBuffer = createImage(xsize, ysize);
@@ -341,10 +332,11 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         }
         return ret;
     }
-    
+
+    /**
+     * Draws an arrow. Used for drawing MO,SA,SD,... commands.
+     */
     private void drawArrowLine(Graphics g, int x1, int y1, int x2, int y2) {
-        //        g.drawLine(x1,y1,x2,y2);
-        //        g.fillOval((int)(x2-size/8),(int)(y2-size/8), (int)(size/4), (int)(size/4));
         DrawUtil.drawArrow(g, x1, y1, x2, y2);
     }
     
@@ -401,11 +393,16 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         
     }
     
+    /**
+     * Draws a unit.
+     */
     private void drawUnit(Graphics g, int i, int j, int unitId, Color c, Color bc) {
         drawUnit(g, i, j, unitId, c, bc, bc);
     }
     
-    
+    /**
+     * Draws a unit.
+     */
     private void drawUnit(Graphics g, int i, int j, int unitId, Color c, Color bc, Color bc2) {
         double jj = j - (i % 2)*0.5;
         int x1 = (int)(topx-size*cos30+i*xdiff);
@@ -415,6 +412,9 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         unit.draw(g, x1, y1, size, (int)(3.0/4*size), c, bc, bc2);
     }
     
+    /**
+     * Draw the spied hexes of an area.
+     */
     private void drawSpy(Graphics g, Area a) {
         drawSpyOne(g, a.getX(1), a.getY(1) );
         if( a.getX(2) != 0 ) {
@@ -425,6 +425,9 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         }
     }
     
+    /**
+     * Draws one spied hex. Draws more than one times because of the looping.
+     */
     private void drawSpyOne(Graphics g, int i, int j) {
         drawSpyOneReal(g,i,j);
         drawSpyOneReal(g,i+adb.getXSize(),j);
@@ -432,7 +435,9 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         drawSpyOneReal(g,i+adb.getXSize(),j+adb.getYSize());
     }
     
-    
+    /**
+     * Draws one spied hex.
+     */
     private void drawSpyOneReal(Graphics g, int i, int j) {
         double jj = j - (i % 2)*0.5;
         int x1 = (int)(topx-2*size*cos30+i*xdiff);
@@ -441,6 +446,9 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         g.drawImage(spyImage, x1, y1, null);
     }
     
+    /**
+     * Draws the id number of an area.
+     */
     private void drawNumber(Graphics g, int i, int j, String text) {
         double jj = j - (i % 2)*0.5;
         int x = (int)(topx-size*cos30+i*xdiff);
@@ -532,6 +540,9 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
 //         }
 //     }
     
+    /**
+     * Calculates the color for an area.
+     */
     private Color getColor(AreaInformation ai) {
         if( ai == null ) {
             return unknownColor;

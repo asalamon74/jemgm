@@ -241,21 +241,24 @@ public class Map  {
                             int i=8;
                             int relId2=0;
                             while( i < line.length() ) {
-                                ++relId2;                                
-                                System.out.printf("Relation [%d, %d]: [%s]\n",relId, relId2, line.substring(i, i+5));                                
-                                relStr = line.substring(i,i+1);
-                                if( relStr.equals("W") ) {
-                                    pr.setRelation(relId, relId2, PlayersRelation.RelationType.WAR);
-                                    pr.setRelation(relId2, relId, PlayersRelation.RelationType.WAR);                                    
-                                } else if( relStr.equals("A")) {
-                                    pr.setRelation(relId, relId2, PlayersRelation.RelationType.ALLY);
-                                    pr.setRelation(relId2, relId, PlayersRelation.RelationType.ALLY);
-                                } else if( relStr.equals("-")) {
-                                    pr.setRelation(relId, relId2, PlayersRelation.RelationType.NOREL);
-                                    pr.setRelation(relId2, relId, PlayersRelation.RelationType.NOREL);
-                                } else {
-                                    pr.setRelation(relId, relId2, PlayersRelation.RelationType.NEUTRAL);
-                                    pr.setRelation(relId2, relId, PlayersRelation.RelationType.NEUTRAL);
+                                ++relId2;                      
+                                if( relId != relId2 ) {
+                                    System.out.printf("Relation [%d, %d]: [%s]\n",relId, relId2, line.substring(i, i+5));                                
+                                    relStr = line.substring(i,i+1);
+                                    if( relStr.equals("W") ) {
+                                        pr.setRelation(relId, relId2, PlayersRelation.RelationType.WAR);
+                                        pr.setRelation(relId2, relId, PlayersRelation.RelationType.WAR);                                    
+                                    } else if( relStr.equals("A")) {
+                                        pr.setRelation(relId, relId2, PlayersRelation.RelationType.ALLY);
+                                        pr.setRelation(relId2, relId, PlayersRelation.RelationType.ALLY);
+                                    } else if( relStr.equals("-")) {
+                                        pr.setRelation(relId, relId2, PlayersRelation.RelationType.NOREL);
+                                        pr.setRelation(relId2, relId, PlayersRelation.RelationType.NOREL);
+                                    } else {
+                                        pr.setRelation(relId, relId2, PlayersRelation.RelationType.NEUTRAL);
+                                        pr.setRelation(relId2, relId, PlayersRelation.RelationType.NEUTRAL);
+                                    }                                    
+                                    System.out.println("After setRelation");
                                 }
                                 i += 5;
                             }
@@ -272,7 +275,7 @@ public class Map  {
                         break;
                     case ALLIANCE_HEADLINES:
                         Pattern offeredRefused = Pattern.compile("(.*)offered(.*)an alliance, but was refused");
-                        Pattern allied = Pattern.compile("(.*)and(.*)have formed an alliance");
+                        Pattern allied = Pattern.compile("(.*) and (.*)have formed an alliance");
                         Pattern brokeAlliance = Pattern.compile("(.*)broke alliance with(.*)");
                         Pattern declaredWarOn = Pattern.compile("(.*)declared war on(.*)");
                         Pattern offeredEndOfWar = Pattern.compile("(.*)offered to end the war, but(.*)refused");
@@ -283,16 +286,33 @@ public class Map  {
                         Matcher declaredWarOnMatcher = declaredWarOn.matcher(line);
                         Matcher offeredEndOfWarMatcher = offeredEndOfWar.matcher(line);
                         
+                        Player p1,p2;
                         if( offeredRefusedMatcher.matches()) {
-                            System.out.printf("[%s] a [%s]\n",offeredRefusedMatcher.group(1), offeredRefusedMatcher.group(2));
+                            p1 = game.getPlayer(offeredRefusedMatcher.group(1).trim());
+                            p2 = game.getPlayer(offeredRefusedMatcher.group(2).trim());
+                            //System.out.printf("[%s] a [%s]\n",offeredRefusedMatcher.group(1), offeredRefusedMatcher.group(2));
+                            pr.setRelation(p1, p2, PlayersRelation.RelationType.OFFERED_ALLY); 
                         } else if( alliedMatcher.matches()) {
-                            System.out.printf("[%s] A [%s]\n",alliedMatcher.group(1), alliedMatcher.group(2));
+                            p1 = game.getPlayer(alliedMatcher.group(1).trim());
+                            p2 = game.getPlayer(alliedMatcher.group(2).trim());
+                            //System.out.printf("[%s] A [%s]\n",alliedMatcher.group(1), alliedMatcher.group(2));
+                            pr.setRelation(p1, p2, PlayersRelation.RelationType.OFFERED_ALLY); 
+                            pr.setRelation(p2, p1, PlayersRelation.RelationType.OFFERED_ALLY); 
                         } else if( brokeAllianceMatcher.matches() ) {
-                            System.out.printf("[%s] n [%s]\n",brokeAllianceMatcher.group(1), brokeAllianceMatcher.group(2));
+                            p1 = game.getPlayer(brokeAllianceMatcher.group(1).trim());
+                            p2 = game.getPlayer(brokeAllianceMatcher.group(2).trim());
+                            //System.out.printf("[%s] n [%s]\n",brokeAllianceMatcher.group(1), brokeAllianceMatcher.group(2));
+                            pr.setRelation(p1, p2, PlayersRelation.RelationType.OFFERED_NEUTRAL); 
                         } else if( declaredWarOnMatcher.matches() ) {
-                            System.out.printf("[%s] w [%s]\n",declaredWarOnMatcher.group(1), declaredWarOnMatcher.group(2));
+                            p1 = game.getPlayer(declaredWarOnMatcher.group(1).trim());
+                            p2 = game.getPlayer(declaredWarOnMatcher.group(2).trim());                            
+                            //System.out.printf("[%s] w [%s]\n",declaredWarOnMatcher.group(1), declaredWarOnMatcher.group(2));
+                            pr.setRelation(p1, p2, PlayersRelation.RelationType.OFFERED_WAR);                             
                         } else if( offeredEndOfWarMatcher.matches()) {
-                            System.out.printf("[%s] wr [%s]\n",offeredEndOfWarMatcher.group(1), offeredEndOfWarMatcher.group(2));
+                            p1 = game.getPlayer(offeredEndOfWarMatcher.group(1).trim());
+                            p2 = game.getPlayer(offeredEndOfWarMatcher.group(2).trim());                                                        
+                            //System.out.printf("[%s] wr [%s]\n",offeredEndOfWarMatcher.group(1), offeredEndOfWarMatcher.group(2));
+                            pr.setRelation(p1, p2, PlayersRelation.RelationType.OFFERED_NEUTRAL);
                         } else {
                             System.out.println("Unknown alliance line:"+line);
                         }

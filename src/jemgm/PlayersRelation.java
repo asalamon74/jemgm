@@ -47,6 +47,10 @@ public class PlayersRelation  {
         relations = new RelationType[this.game.getPlayerNum()][this.game.getPlayerNum()];
     }
     
+    public void setRelation(Player pl1, Player pl2, RelationType rel) {
+        setRelation(pl1.getNum(), pl2.getNum(), rel);
+    }
+    
     public void setRelation(int player1, int player2, RelationType rel) {
         relations[player1][player2] = rel;
         //        relations[player2][player1] = rel;

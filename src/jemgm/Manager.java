@@ -16,12 +16,9 @@ import javax.mail.*;
 import javax.mail.internet.*;
 
 /**
- * AODManager.java
+ * Manager.
  *
- *
- * Created: Sun Feb 17 13:43:06 2002
- *
- * @author Salamon Andras
+ * This is the main class. 
  */
 public class Manager extends JFrame implements ActionListener, ItemListener {
     
@@ -578,7 +575,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
     public void openGame() {
         System.out.println("open Game:");
         JFileChooser fc = new JFileChooser();
-        fc.setDialogTitle("Load AOD Game");
+        fc.setDialogTitle("Load EMG Game");
         
         fc.setFileFilter(filter);
         int retVal = fc.showOpenDialog(this);
@@ -1038,9 +1035,9 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
     private int      popupX, popupY;
     
     private JTextArea commentTextArea;
-    private static String windowTitle = "AOD Manager";
+    private static String windowTitle = "EMG Manager";
     private static Manager __instance;
     private static String defaultBotMailAddress = "emg.pbm@shaw.ca";
     public boolean bccSelf = true;
     private Vector<String> recents = new Vector<String>();
-} // AODManager
+} // Manager

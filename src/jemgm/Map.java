@@ -107,7 +107,7 @@ public class Map  {
         }
         Vector<String> headLines  = new Vector<String>();
         int plNum=0;
-        
+        int relId=0;
         try {
             BufferedReader reader = new BufferedReader(new FileReader(game.getDirectory()+getFileName()));
             while( (line = reader.readLine()) != null ) {
@@ -230,18 +230,33 @@ public class Map  {
                         
                         break;
                     case RELATIONS:
-//                        if( pr == null ) {
-//                            pr = new PlayersRelation(game);
-//                        }
                         if( line.matches("\\=*")) {
                             // ===== line, ignore
                             continue;
                         }
+                        String relStr;
                         // no delimiter character, we assume fix width
                         if( line.substring(8).matches("[\\sWAN\\-]*")) {
+                            ++relId;
                             int i=8;
+                            int relId2=0;
                             while( i < line.length() ) {
-                                //                                System.out.printf("Relation: [%s]\n",line.substring(i, i+5));
+                                ++relId2;                                
+                                System.out.printf("Relation [%d, %d]: [%s]\n",relId, relId2, line.substring(i, i+5));                                
+                                relStr = line.substring(i,i+1);
+                                if( relStr.equals("W") ) {
+                                    pr.setRelation(relId, relId2, PlayersRelation.RelationType.WAR);
+                                    pr.setRelation(relId2, relId, PlayersRelation.RelationType.WAR);                                    
+                                } else if( relStr.equals("A")) {
+                                    pr.setRelation(relId, relId2, PlayersRelation.RelationType.ALLY);
+                                    pr.setRelation(relId2, relId, PlayersRelation.RelationType.ALLY);
+                                } else if( relStr.equals("-")) {
+                                    pr.setRelation(relId, relId2, PlayersRelation.RelationType.NOREL);
+                                    pr.setRelation(relId2, relId, PlayersRelation.RelationType.NOREL);
+                                } else {
+                                    pr.setRelation(relId, relId2, PlayersRelation.RelationType.NEUTRAL);
+                                    pr.setRelation(relId2, relId, PlayersRelation.RelationType.NEUTRAL);
+                                }
                                 i += 5;
                             }
                         }

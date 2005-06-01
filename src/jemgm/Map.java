@@ -111,6 +111,7 @@ public class Map  {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(game.getDirectory()+getFileName()));
             while( (line = reader.readLine()) != null ) {
+                System.out.println("line:"+line);
                 if( line.matches(".*Current Status.*") ) {
                     state = ParserState.AREA;
                     continue;
@@ -186,6 +187,7 @@ public class Map  {
                         }
                         break;
                     case AREA:
+                        System.out.println("area");
                         if( !line.matches(".*\\d.*") ) {
                             // no number in the line, we can skip it.
                             continue;
@@ -194,8 +196,13 @@ public class Map  {
                         StringTokenizer tokenizer = new StringTokenizer(line, "|");
                         // concatenate the broken lines if necessery
                         while( tokenizer.countTokens() < 10 || !line.matches(".*\\|")) {
-                            line += reader.readLine();
-                            tokenizer = new StringTokenizer(line, "|");
+                            if( reader.readLine() != null ) {
+                                line += reader.readLine();
+                                tokenizer = new StringTokenizer(line, "|");
+                            } else {
+                                // probably wrong format.
+                                return false;
+                            }
                         }
                         String id = tokenizer.nextToken().trim();
                         String areaName = tokenizer.nextToken().trim();

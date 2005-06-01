@@ -140,7 +140,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         reportsButton = new JButton("Reports");
         openButton = new JButton("Open");
         saveButton = new JButton("Save");
-        commentButton = new JToggleButton("Comment");
         
         navigatorPanel = new JPanel();
         navigatorPanel.setLayout(new FlowLayout(FlowLayout.CENTER,0,0));
@@ -154,7 +153,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         reportsButton.addActionListener(this);
         openButton.addActionListener(this);
         saveButton.addActionListener(this);
-        commentButton.addActionListener(this);
         firstButton.addActionListener(this);
         prevButton.addActionListener(this);
         nextButton.addActionListener(this);
@@ -165,7 +163,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         commandPanel.add(reportsButton);
         commandPanel.add(openButton);
         commandPanel.add(saveButton);
-        commandPanel.add(commentButton);
         
         navigatorPanel.add(firstButton);
         navigatorPanel.add(prevButton);
@@ -182,16 +179,15 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         map = new HexMap(this);
         map.setBackground(HexMap.unknownColor);
         map.addMouseListener(new PopupListener());
-        commentTextArea = new JTextArea(40,40);
-        //commentTextArea = new JTextArea();
+        commentTextArea = new JTextArea(40,40);        
         commentTextArea.setVisible(false);
-        
-        split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, map, commentTextArea);
-        split.setResizeWeight(1);
+                
+        tabbedPane = new JTabbedPane();
+        tabbedPane.add("Map", map);
+        tabbedPane.add("Comment", commentTextArea);
         
         getContentPane().add(northPanel, BorderLayout.NORTH);
-        //        getContentPane().add(map, BorderLayout.CENTER);
-        getContentPane().add(split, BorderLayout.CENTER);
+        getContentPane().add(tabbedPane, BorderLayout.CENTER);
         
         statusPanel = new JPanel();
         statusLabel = new JLabel(":");
@@ -280,17 +276,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
             openGame();
         } else if( source.equals(saveGameMenuItem) || source.equals(saveButton) ) {
             saveGame();
-        } else if( source.equals(commentButton) ) {
-            if( commentTextArea.isVisible() ) {
-                commentTextArea.setVisible(false);
-                splitDividerLocation = split.getDividerLocation();
-                //                getContentPane().remove(commentTextArea);
-            } else {
-                commentTextArea.setVisible(true);
-                split.setDividerLocation(splitDividerLocation);
-                //                getContentPane().add(commentTextArea, BorderLayout.EAST);
-            }
-            validate();
         } else if( source.equals(relationsMenuItem) ) {
             VisualPlayersRelation vpr = new VisualPlayersRelation(getTurn(getActTurnNumber()).getPr());
             vpr.setVisible(true);
@@ -785,7 +770,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         this.gameLoaded = v;
         navigatorPanel.setEnabled(gameLoaded);
         saveButton.setEnabled(gameLoaded);
-        commentButton.setEnabled(gameLoaded);
         reportsButton.setEnabled(gameLoaded);
         commandButtonPanel.setEnabled(gameLoaded);
         viewMenu.setEnabled(gameLoaded);
@@ -1015,14 +999,13 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
     private JPanel    navigatorPanel;
     private JButton   openButton;
     private JButton   saveButton;
-    private JToggleButton   commentButton;
     private JButton   reportsButton;
     private JButton   firstButton;
     private JButton   prevButton;
     private JButton   nextButton;
     private JButton   lastButton;
     private HexMap   map;
-    private JSplitPane split;
+    private JTabbedPane tabbedPane;
     private JLabel    statusLabel;
     private JLabel    commandLabel;
     private JPanel    statusPanel;
@@ -1031,7 +1014,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
     private int[]    commandParam = new int[20];
     private CommandType commandType;
     private Command  actCommand;
-    private int      splitDividerLocation=500;
     private int      popupX, popupY;
     
     private JTextArea commentTextArea;

@@ -50,11 +50,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         fileMenu.add(exitMenuItem);
         menuBar.add(fileMenu);
         
-        viewMenu = new JMenu("View");
-        
-        chartsMenuItem = new JMenuItem("Charts");
-        viewMenu.add(chartsMenuItem);
-        menuBar.add(viewMenu);
         
         commandsMenu = new JMenu("Commands");
         diplomacyMenuItem = new JMenuItem("Diplomacy");
@@ -100,7 +95,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         openGameMenuItem.addActionListener(this);
         saveGameMenuItem.addActionListener(this);
         exitMenuItem.addActionListener(this);
-        chartsMenuItem.addActionListener(this);
         diplomacyMenuItem.addActionListener(this);
         victoryConditionsMenuItem.addActionListener(this);
         viewMenuItem.addActionListener(this);
@@ -195,7 +189,8 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         tabbedPane.add("Map", map);
         tabbedPane.add("Relations", vpr);
         tabbedPane.add("Alliance headlines", allianceHeadlines);
-        tabbedPane.add("Comment", commentTextArea);        
+        tabbedPane.add("Chart", Charts.getInstance(this));
+        tabbedPane.add("Comment", commentTextArea);              
         
         getContentPane().add(northPanel, BorderLayout.NORTH);
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
@@ -287,9 +282,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
             openGame();
         } else if( source.equals(saveGameMenuItem) || source.equals(saveButton) ) {
             saveGame();
-        } else if( source.equals(chartsMenuItem) ) {
-            System.out.println("charts");
-            Charts.getInstance(this).setVisible(true);
         } else if( source.equals(diplomacyMenuItem) ) {
             Diplomacy dip = new Diplomacy(getGame(), getTurn(getActTurnNumber()).getPr(), map.getCc());
             dip.setVisible(true);
@@ -734,6 +726,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         System.out.println("B");
         vpr.setPr(tt.getPr());
         updateAllianceHeadlines(tt);
+        Charts.getInstance(this).fillComponents();
         if( getActTurnNumber() == getGame().getMapcoll().getLatestTurn()) {
             commandButtonPanel.setEnabled(true);
             diplomacyMenuItem.setEnabled(true);
@@ -798,7 +791,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         saveButton.setEnabled(gameLoaded);
         reportsButton.setEnabled(gameLoaded);
         commandButtonPanel.setEnabled(gameLoaded);
-        viewMenu.setEnabled(gameLoaded);
         commandsMenu.setEnabled(gameLoaded);
         emailMenuItem.setEnabled(gameLoaded);
     }
@@ -1000,8 +992,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
     private JMenuItem openGameMenuItem;
     private JMenuItem saveGameMenuItem;
     private JMenuItem exitMenuItem;
-    private JMenu     viewMenu;
-    private JMenuItem chartsMenuItem;
     private JMenu     commandsMenu;
     private JMenuItem diplomacyMenuItem;
     private JMenuItem victoryConditionsMenuItem;

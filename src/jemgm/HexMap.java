@@ -57,8 +57,8 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
     public void setAdb(AreaDataBase  v) {
         this.adb = v;
         Player p = aodm.game.getPlayer();
-        System.out.println("supply:"+adb.getSupplyPointNum(p));
-        System.out.println("army:"+adb.getArmyStrength(p));
+        //System.out.println("supply:"+adb.getSupplyPointNum(p));
+        //System.out.println("army:"+adb.getArmyStrength(p));
     }
     
     
@@ -142,6 +142,14 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
                     g.fillPolygon(xpoints, ypoints, 6);
                     g.setColor(borderColor);
                     g.drawPolygon(xpoints, ypoints, 6);
+                    if( ai.getAreaType() != Area.AREA_TYPE_SEA && 
+                        ai.getOwner() != ai.getPrevOwner() ) {
+                        System.out.println("new area: "+ai.getId());
+                        int x1 = (int)(topx-2*size*cos30+i*xdiff);
+                        int y1 = (int)(topy+jj*ydiff-0.5*ydiff);
+        
+                        g.drawImage(newAreaImage, x1, y1, null);
+                    }
                     if( supplyDraw && ai != null && ai.getX(1) == reali && ai.getY(1) == realj &&
                             ai.getSupplyPointNum() != 0 ) {
                         if( drawUnitHere(ai, reali, realj) ||
@@ -316,7 +324,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
                 drawUnit(g, x1, y1+adb.getYSize(), unit, getColor(cai.getOwner()), bColor, c.getType().color);
                 drawUnit(g, x1+adb.getXSize(), y1+adb.getYSize(), unit, getColor(cai.getOwner()), bColor, c.getType().color);
             } else if( c.getType().equals(CommandType.SP) ) {
-                System.out.println("paint spies "+c.getParamNum());
+                //System.out.println("paint spies "+c.getParamNum());
                 for( int si=0; si<c.getParamNum(); ++si ) {
                     AreaInformation sai = adb.getAreaInformation(c.getIntParam(si));
                     if( sai != null ) {
@@ -422,11 +430,18 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
      */
     private void drawUnit(Graphics g, int i, int j, int unitId, Color c, Color bc, Color bc2) {
         double jj = j - (i % 2)*0.5;
+        /*int x1 = (int)(topx-2*size*cos30+i*xdiff);
+        int y1 = (int)(topy+jj*ydiff-0.5*ydiff);
+        
+        g.drawImage(newAreaImage, x1, y1, null);*/
+        
         int x1 = (int)(topx-size*cos30+i*xdiff);
         int y1 = (int)(topy+jj*ydiff);
         
         Unit unit = Unit.getUnit(unitId);
         unit.draw(g, x1, y1, size, (int)(3.0/4*size), c, bc, bc2);
+        
+        
     }
     
     /**
@@ -760,7 +775,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
                 if( cc != null ) {
                     Command c = cc.getCommand(ai);
                     if( c != null ) {
-                        System.out.println("c:"+c);
+                        //System.out.println("c:"+c);
                         statusStr += " ["+c.toHumanReadableString()+"]";
                     }
                 }
@@ -842,8 +857,8 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
     private BasicStroke frontLineStroke = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1f, dash, 0);
     private BasicStroke thickLineStroke = new BasicStroke(1);
     
-    protected Image spyImage = Toolkit.getDefaultToolkit().getImage(
-            this.getClass().getResource( "/images/spy.png" ));
+    protected Image spyImage = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource( "/images/spy.png" ));
+    protected Image newAreaImage = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource( "/images/newarea.png" ));
 
     public boolean isShowFrontLines() {
         return showFrontLines;

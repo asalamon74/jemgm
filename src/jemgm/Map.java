@@ -219,11 +219,11 @@ public class Map  {
                         AreaInformation ai = new AreaInformation();
                         ai.setId(Integer.parseInt(id));
                         if( currentAreaOwner.equals("****") ) {
-                            currentAreaOwner = game.getPlayer().getAbbrev();
+                            currentAreaOwner = getPlayer().getAbbrev();
                         }
                         ai.setOwner(game.getPlayer(currentAreaOwner).getNum());
                         if( currentUnitOwner.equals("****") ) {
-                            currentUnitOwner = game.getPlayer().getAbbrev();
+                            currentUnitOwner = getPlayer().getAbbrev();
                         }
                         if( currentUnitType.length() > 0 ) {
                             ai.setUnitType(Unit.getUnit(currentUnitType).getId());

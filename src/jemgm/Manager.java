@@ -215,10 +215,10 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         Object source = evt.getSource();
         if( source.equals(unitImagesMenuItem) ) {
             Unit.setShowUnitImages(unitImagesMenuItem.getState());
-            map.needRepaint = true;
         } else if ( source.equals(frontLinesMenuItem) ){
-            map.setShowFrontLines(frontLinesMenuItem.getState());
+            map.setShowFrontLines(frontLinesMenuItem.getState());            
         }
+        map.needRepaint = true;
         map.repaint();
         validate();        
     }
@@ -668,6 +668,10 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
             newTurn.setCc(cc);
             PlayersRelation plr = new PlayersRelation(getGame());
             newTurn.setAreadb(getGame().mapCollectionProcess(v, plr));
+            if( v > 1 ) {
+                Turn prevTurn = getTurn(v-1);
+                newTurn.getAreadb().calculatePrevOwners(prevTurn.getAreadb());
+            }                       
             newTurn.setPr(plr);
             getGame().setTurn(v, newTurn);
             return newTurn;

@@ -4,16 +4,15 @@ import java.awt.FlowLayout;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Color;
-import java.awt.Frame;
 import java.awt.Dimension;
 import java.awt.event.*;
 import java.util.*;
 import java.io.*;
 import com.l2fprod.gui.plaf.skin.SkinLookAndFeel;
 import javax.swing.*;
-import javax.swing.filechooser.*;
 import javax.mail.*;
 import javax.mail.internet.*;
+import javax.swing.text.*;
 
 /**
  * Manager.
@@ -52,9 +51,8 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         menuBar.add(fileMenu);
         
         viewMenu = new JMenu("View");
-        allianceMenuItem = new JMenuItem("Alliance Headlines");
+        
         chartsMenuItem = new JMenuItem("Charts");
-        viewMenu.add(allianceMenuItem);
         viewMenu.add(chartsMenuItem);
         menuBar.add(viewMenu);
         
@@ -102,7 +100,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         openGameMenuItem.addActionListener(this);
         saveGameMenuItem.addActionListener(this);
         exitMenuItem.addActionListener(this);
-        allianceMenuItem.addActionListener(this);
         chartsMenuItem.addActionListener(this);
         diplomacyMenuItem.addActionListener(this);
         victoryConditionsMenuItem.addActionListener(this);
@@ -180,10 +177,24 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         commentTextArea.setVisible(false);
                 
         vpr = new VisualPlayersRelation();
+        allianceHeadlines = new JTextPane();
+        
+        StyledDocument doc = allianceHeadlines.getStyledDocument(); 
+        
+        Style def = StyleContext.getDefaultStyleContext().
+        getStyle(StyleContext.DEFAULT_STYLE);
+
+        Style regular = doc.addStyle("regular", def);
+        StyleConstants.setFontFamily(def, "SansSerif");
+        StyleConstants.setFontSize(def, 14);
+
+        Style s = doc.addStyle("bold", regular);
+        StyleConstants.setBold(s, true);        
         
         tabbedPane = new JTabbedPane();
         tabbedPane.add("Map", map);
         tabbedPane.add("Relations", vpr);
+        tabbedPane.add("Alliance headlines", allianceHeadlines);
         tabbedPane.add("Comment", commentTextArea);        
         
         getContentPane().add(northPanel, BorderLayout.NORTH);
@@ -276,10 +287,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
             openGame();
         } else if( source.equals(saveGameMenuItem) || source.equals(saveButton) ) {
             saveGame();
-        } else if( source.equals(allianceMenuItem) ) {
-            String allianceHeadlines =getTurn(getActTurnNumber()).getPr().getAllianceHeadlines();
-            JOptionPane.showMessageDialog(this, allianceHeadlines, "Alliance Headlines", JOptionPane.INFORMATION_MESSAGE);
-            
         } else if( source.equals(chartsMenuItem) ) {
             System.out.println("charts");
             Charts.getInstance(this).setVisible(true);
@@ -726,6 +733,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         }
         System.out.println("B");
         vpr.setPr(tt.getPr());
+        updateAllianceHeadlines(tt);
         if( getActTurnNumber() == getGame().getMapcoll().getLatestTurn()) {
             commandButtonPanel.setEnabled(true);
             diplomacyMenuItem.setEnabled(true);
@@ -749,6 +757,26 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         statusLabel.setText(text);
     }
     
+    public void updateAllianceHeadlines(Turn tt) {
+        // alliance headlines
+        String []allianceStrs = tt.getPr().getAllianceHeadlines();
+        StyledDocument doc = allianceHeadlines.getStyledDocument();
+        String playerName = game.getPlayer().getName();
+        Style s;
+        for( int i=0; i<allianceStrs.length; ++i ) {
+            try {
+                if( allianceStrs[i].indexOf(playerName) != -1 ) {
+                    s = doc.getStyle("bold");
+                } else {
+                    s = doc.getStyle("regular");
+                }
+                doc.insertString(doc.getLength(), allianceStrs[i]+"\n", s);
+            } catch( BadLocationException e) {
+                System.out.println("BadLocation: "+e);
+            }
+        }
+        
+    }
     
     boolean gameLoaded;
     
@@ -973,7 +1001,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
     private JMenuItem saveGameMenuItem;
     private JMenuItem exitMenuItem;
     private JMenu     viewMenu;
-    private JMenuItem allianceMenuItem;
     private JMenuItem chartsMenuItem;
     private JMenu     commandsMenu;
     private JMenuItem diplomacyMenuItem;
@@ -1015,6 +1042,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
     
     private JTextArea commentTextArea;
     private VisualPlayersRelation vpr;
+    private JTextPane allianceHeadlines;
     private static String windowTitle = "EMG Manager";
     private static Manager __instance;
     private static String defaultBotMailAddress = "emg.pbm@shaw.ca";

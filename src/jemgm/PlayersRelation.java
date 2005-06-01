@@ -1,6 +1,7 @@
 package jemgm;
 
 import java.awt.Color;
+import java.util.Vector;
 
 /**
  * PlayersRelation
@@ -123,18 +124,20 @@ public class PlayersRelation  {
         return headline;
     }
     
-    public String getAllianceHeadlines() {
-        String headlines="";
+    public String[] getAllianceHeadlines() {
+        Vector<String> headlines=new Vector<String>();
         String headline;
         for( int i=1; i<relations.length; ++i ) {
             for( int j=i+1; j<relations.length; ++j ) {
                 headline = getAllianceHeadline(i,j);
                 if( headline != null ) {
-                    headlines += headline + "\n";
+                    headlines.add( headline );
                 }
             }
-        }
-        return headlines;
+        }        
+        String []ret = new String[headlines.size()];
+        headlines.toArray(ret);
+        return ret;
     }
     
     public int getPlayerNum() {

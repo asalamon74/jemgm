@@ -52,10 +52,8 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         menuBar.add(fileMenu);
         
         viewMenu = new JMenu("View");
-        relationsMenuItem = new JMenuItem("Relations");
         allianceMenuItem = new JMenuItem("Alliance Headlines");
         chartsMenuItem = new JMenuItem("Charts");
-        viewMenu.add(relationsMenuItem);
         viewMenu.add(allianceMenuItem);
         viewMenu.add(chartsMenuItem);
         menuBar.add(viewMenu);
@@ -104,7 +102,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         openGameMenuItem.addActionListener(this);
         saveGameMenuItem.addActionListener(this);
         exitMenuItem.addActionListener(this);
-        relationsMenuItem.addActionListener(this);
         allianceMenuItem.addActionListener(this);
         chartsMenuItem.addActionListener(this);
         diplomacyMenuItem.addActionListener(this);
@@ -182,9 +179,12 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         commentTextArea = new JTextArea(40,40);        
         commentTextArea.setVisible(false);
                 
+        vpr = new VisualPlayersRelation();
+        
         tabbedPane = new JTabbedPane();
         tabbedPane.add("Map", map);
-        tabbedPane.add("Comment", commentTextArea);
+        tabbedPane.add("Relations", vpr);
+        tabbedPane.add("Comment", commentTextArea);        
         
         getContentPane().add(northPanel, BorderLayout.NORTH);
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
@@ -276,9 +276,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
             openGame();
         } else if( source.equals(saveGameMenuItem) || source.equals(saveButton) ) {
             saveGame();
-        } else if( source.equals(relationsMenuItem) ) {
-            VisualPlayersRelation vpr = new VisualPlayersRelation(getTurn(getActTurnNumber()).getPr());
-            vpr.setVisible(true);
         } else if( source.equals(allianceMenuItem) ) {
             String allianceHeadlines =getTurn(getActTurnNumber()).getPr().getAllianceHeadlines();
             JOptionPane.showMessageDialog(this, allianceHeadlines, "Alliance Headlines", JOptionPane.INFORMATION_MESSAGE);
@@ -728,6 +725,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
             map.repaint();
         }
         System.out.println("B");
+        vpr.setPr(tt.getPr());
         if( getActTurnNumber() == getGame().getMapcoll().getLatestTurn()) {
             commandButtonPanel.setEnabled(true);
             diplomacyMenuItem.setEnabled(true);
@@ -975,7 +973,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
     private JMenuItem saveGameMenuItem;
     private JMenuItem exitMenuItem;
     private JMenu     viewMenu;
-    private JMenuItem relationsMenuItem;
     private JMenuItem allianceMenuItem;
     private JMenuItem chartsMenuItem;
     private JMenu     commandsMenu;
@@ -1017,6 +1014,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
     private int      popupX, popupY;
     
     private JTextArea commentTextArea;
+    private VisualPlayersRelation vpr;
     private static String windowTitle = "EMG Manager";
     private static Manager __instance;
     private static String defaultBotMailAddress = "emg.pbm@shaw.ca";

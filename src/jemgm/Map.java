@@ -392,15 +392,17 @@ public class Map  {
                             ++lineNum;
                             break;
                         case 5:
-                            st = new StringTokenizer(line, " ,");
-                            String abbrev = st.nextToken();
-                            String name = st.nextToken();
-                            String relationString = st.nextToken();
+                            st = new StringTokenizer(line, ",");
+                            String abbrev = st.nextToken().trim();
+                            String name = st.nextToken().trim();
+                            String relationString = st.nextToken().trim();
                             if( !abbrev.equalsIgnoreCase("Unkwn") ) {
                                 if( pr != null ) {
                                     Player p = game.getPlayer(abbrev);
+                                    System.out.println("p:"+p.getName());
                                     for( int i=0; i<relationString.length() && i<game.getPlayerNum(); ++i ) {
                                         String c = ""+relationString.charAt(i);
+                                        System.out.printf("i: %d c: %s\n", i, c);
                                         if( "W".equals(c) ) {
                                             pr.setRelation(p.getNum(), i, PlayersRelation.RelationType.WAR);
                                         } else if( "w".equals(c) ) {

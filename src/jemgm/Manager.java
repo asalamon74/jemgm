@@ -671,7 +671,10 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
             if( v > 1 ) {
                 Turn prevTurn = getTurn(v-1);
                 newTurn.getAreadb().calculatePrevOwners(prevTurn.getAreadb());
-            }                       
+            } else {
+                newTurn.getAreadb().calculatePrevOwners(null); 
+            }
+                                   
             newTurn.setPr(plr);
             getGame().setTurn(v, newTurn);
             return newTurn;

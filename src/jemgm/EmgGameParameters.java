@@ -33,6 +33,7 @@ public class EmgGameParameters {
                 maxSpy = 6;
                 break;
         }
+        System.out.println("maxSpy:"+maxSpy);
         return maxSpy;
     }
     

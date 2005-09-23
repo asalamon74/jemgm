@@ -36,10 +36,10 @@ public class CommandType {
     public static final CommandType CA = new CommandType("CA", "Call to Arms",       2);
 
     // we need to initialize here, because the main program uses this info for creating buttons
-    public static CommandType SP = new CommandType("SP", "Spy", 0);
+    public static CommandType SP = new CommandType("SP", "Spy", 0, Color.red);
 
 	
-    public static final CommandType[] commandTypes = {
+    public static CommandType[] commandTypes = {
 	SA, SD, MO, AC, AA, AS, AF, UU, SP, GA, DA, DN, DW, DU, RU, ME, VC, CO, CA
     };
 
@@ -50,7 +50,10 @@ public class CommandType {
      * Spy command has different parameters in GD* and AOD games.
      */
     public static void initGameDependentCommandTypes(EmgGameParameters emgParam) {
-	SP = new CommandType("SP", "Spy", -emgParam.getMaxSpyNum(), Color.red, CommandType.COMMAND_TYPE_UNIQUE);
+        //System.out.println("spynum: "+commandTypes[8].paramNum);
+        SP = new CommandType("SP", "Spy", -emgParam.getMaxSpyNum(), Color.red, CommandType.COMMAND_TYPE_UNIQUE);
+        commandTypes[8] = SP;
+        //System.out.println("spynum: "+commandTypes[8].paramNum);
     }
 
     // TODO: list the others

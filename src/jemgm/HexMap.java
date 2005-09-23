@@ -14,7 +14,7 @@ import javax.swing.*;
 public class HexMap extends JPanel implements MouseListener, MouseMotionListener {
     
     Image capitalImage =  Toolkit.getDefaultToolkit().getImage( "images/capital.png" );
-    
+
     public HexMap(Manager aodm) {
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -325,7 +325,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
                 drawUnit(g, x1, y1+adb.getYSize(), unit, getColor(cai.getOwner()), bColor, c.getType().color);
                 drawUnit(g, x1+adb.getXSize(), y1+adb.getYSize(), unit, getColor(cai.getOwner()), bColor, c.getType().color);
             } else if( c.getType().equals(CommandType.SP) ) {
-                //System.out.println("paint spies "+c.getParamNum());
+                System.out.println("paint spies "+c.getParamNum());
                 for( int si=0; si<c.getParamNum(); ++si ) {
                     AreaInformation sai = adb.getAreaInformation(c.getIntParam(si));
                     if( sai != null ) {
@@ -449,12 +449,10 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
      * Draw the spied hexes of an area.
      */
     private void drawSpy(Graphics g, Area a) {
-        drawSpyOne(g, a.getX(1), a.getY(1) );
-        if( a.getX(2) != 0 ) {
-            drawSpyOne(g, a.getX(2), a.getY(2) );
-        }
-        if( a.getX(3) != 0 ) {
-            drawSpyOne(g, a.getX(3), a.getY(3) );
+        //System.out.println("drawSpy:"+a.getId()+" size: "+a.getSize());
+        
+        for( int i=1; i<=a.getSize(); ++i) {
+            drawSpyOne(g, a.getX(i), a.getY(i) );
         }
     }
     
@@ -462,6 +460,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
      * Draws one spied hex. Draws more than one times because of the looping.
      */
     private void drawSpyOne(Graphics g, int i, int j) {
+        //System.out.printf("drawSpyOne: %d, %d\n", i, j);
         drawSpyOneReal(g,i,j);
         drawSpyOneReal(g,i+adb.getXSize(),j);
         drawSpyOneReal(g,i,j+adb.getYSize());

@@ -196,8 +196,9 @@ public class Map  {
                         StringTokenizer tokenizer = new StringTokenizer(line, "|");
                         // concatenate the broken lines if necessery
                         while( tokenizer.countTokens() < 10 || !line.matches(".*\\|")) {
-                            if( reader.readLine() != null ) {
-                                line += reader.readLine();
+                            String nextLine = reader.readLine();
+                            if( nextLine != null ) {
+                                line += nextLine;
                                 tokenizer = new StringTokenizer(line, "|");
                             } else {
                                 // probably wrong format.

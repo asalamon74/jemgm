@@ -193,13 +193,19 @@ public class Map  {
                             continue;
                         }
                         line = line.trim();
-                        StringTokenizer tokenizer = new StringTokenizer(line, "|");
+                        StringTokenizer tokenizer = new StringTokenizer(line.trim(), "|");
+                        //System.out.println("tokennum:"+tokenizer.countTokens());
                         // concatenate the broken lines if necessery
-                        while( tokenizer.countTokens() < 10 || !line.matches(".*\\|")) {
+                        while( tokenizer.countTokens() < 10 || !line.trim().matches(".*\\|")) {
                             String nextLine = reader.readLine();
                             if( nextLine != null ) {
+                                if( line.endsWith("|") && nextLine.startsWith("|") ) {
+                                    line += " ";
+                                }
                                 line += nextLine;
-                                tokenizer = new StringTokenizer(line, "|");
+                                //System.out.println("concatline:["+line+"]");
+                                tokenizer = new StringTokenizer(line.trim(), "|");
+                                //System.out.println("contokennum:"+tokenizer.countTokens());
                             } else {
                                 // probably wrong format.
                                 return false;

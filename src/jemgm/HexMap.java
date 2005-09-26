@@ -142,10 +142,10 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
                     g.fillPolygon(xpoints, ypoints, 6);
                     g.setColor(borderColor);
                     g.drawPolygon(xpoints, ypoints, 6);
-                    if( ai.getAreaType() != Area.AREA_TYPE_SEA && 
+                    if( isShowNewArea() && ai.getAreaType() != Area.AREA_TYPE_SEA && 
                         ai.getOwner() != ai.getPrevOwner()  &&
                         ai.getOwner() != 0 ) {
-                        System.out.println("new area: "+ai.getId());
+//                        System.out.println("new area: "+ai.getId());
                         int x1 = (int)(topx-2*size*cos30+i*xdiff);
                         int y1 = (int)(topy+jj*ydiff-0.5*ydiff);
         
@@ -838,6 +838,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
     public static final boolean supplyDraw = true;
 
     private boolean showFrontLines = true;
+    private boolean showNewArea = true;
     
     private boolean  offScreen = false;
     private Image    imageBuffer;
@@ -867,5 +868,13 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
     public void setShowFrontLines(boolean showFrontLines) {
         this.showFrontLines = showFrontLines;
     }
-    
+
+    public boolean isShowNewArea() {
+        return showNewArea;
+    }
+
+    public void setShowNewArea(boolean showNewArea) {
+        this.showNewArea = showNewArea;
+    }
+
 } // HexMap

@@ -69,10 +69,12 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         unitImagesMenuItem = new JCheckBoxMenuItem("Unit Images", true);
         Unit.setShowUnitImages(unitImagesMenuItem.getState());
         frontLinesMenuItem = new JCheckBoxMenuItem("Show frontline");
+        newAreaMenuItem = new JCheckBoxMenuItem("Show new areas", true);
         colorsMenuItem = new JMenuItem("Colors");
         emailMenuItem = new JMenuItem("Emails");
         optionsMenu.add(unitImagesMenuItem);
         optionsMenu.add(frontLinesMenuItem);
+        optionsMenu.add(newAreaMenuItem);
         optionsMenu.add(colorsMenuItem);
         optionsMenu.addSeparator();
         optionsMenu.add(emailMenuItem);
@@ -102,6 +104,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         sendMenuItem.addActionListener(this);
         unitImagesMenuItem.addItemListener(this);
         frontLinesMenuItem.addItemListener(this);
+        newAreaMenuItem.addItemListener(this);
         colorsMenuItem.addActionListener(this);
         emailMenuItem.addActionListener(this);
         
@@ -217,6 +220,8 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
             Unit.setShowUnitImages(unitImagesMenuItem.getState());
         } else if ( source.equals(frontLinesMenuItem) ){
             map.setShowFrontLines(frontLinesMenuItem.getState());            
+        } else if ( source.equals(newAreaMenuItem) ){
+            map.setShowNewArea(newAreaMenuItem.getState());            
         }
         map.needRepaint = true;
         map.repaint();
@@ -466,6 +471,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
             BufferedWriter propsOut = new BufferedWriter(new FileWriter(dirName + "properties"));
             propsOut.write("unitImages: "+unitImagesMenuItem.getState()+"\n");
             propsOut.write("frontLines: "+frontLinesMenuItem.getState()+"\n");
+            propsOut.write("newArea: "+newAreaMenuItem.getState()+"\n");
             propsOut.write("bccSelf: "+bccSelf+"\n");
             for (Enumeration e = recents.elements() ; e.hasMoreElements() ;) {
                 propsOut.write("recent:"+e.nextElement()+"\n");
@@ -501,6 +507,14 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
                         frontLinesMenuItem.setState(true);
                     }
                     map.setShowFrontLines(frontLinesMenuItem.getState());
+                } else if( line.startsWith("newArea:") ) {
+                    // not too nice
+                    if( line.indexOf("false") > -1 ) {
+                        newAreaMenuItem.setState(false);
+                    } else {
+                        newAreaMenuItem.setState(true);
+                    }
+                    map.setShowNewArea(newAreaMenuItem.getState());                    
                 } else if( line.startsWith("recent:") ) {
                     recents.add(line.substring("recent:".length()));
                     JMenuItem recentItem = new JMenuItem(line.substring("recent:".length()));
@@ -1010,6 +1024,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
     private JMenu     optionsMenu;
     private JCheckBoxMenuItem unitImagesMenuItem;
     private JCheckBoxMenuItem frontLinesMenuItem;
+    private JCheckBoxMenuItem newAreaMenuItem;
     private JMenuItem colorsMenuItem;
     private JMenuItem emailMenuItem;
     private JPanel    commandPanel;

@@ -143,11 +143,11 @@ public class Map  {
                 }
                 switch( state ) {
                     case EMAILS:
-                        Matcher botMatcher = Pattern.compile(".*MAIL GAMES:\\s*(.*)\\s*\\|").matcher(line);
+                        /*Matcher botMatcher = Pattern.compile(".*MAIL GAMES:\\s*(.*)\\s*\\|").matcher(line);
                         if( botMatcher.matches() ) {
                             //			    System.out.printf("Bot email: [%s]\n", botMatcher.group(1).trim());
                             game.setBotEmail(botMatcher.group(1).trim());
-                        }
+                        }*/
                         Matcher playerEmailMatcher = Pattern.compile("\\|\\s([A-Z\\-]{1,4})\\s+([\\s\\w\\(\\)]*)\\s{5,}(.*)\\s*\\|").matcher(line);
                         if( headerProcess && playerEmailMatcher.matches() ) {
                             String abbrev = playerEmailMatcher.group(1).trim();

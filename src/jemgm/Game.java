@@ -48,6 +48,7 @@ public class Game  {
                     String name = st.nextToken().trim();
                     String email = st.nextToken().trim();
                     if( num == -1 ) {
+                        //System.out.println("bot e-mail:"+email);
                         setBotEmail(email);
                         // add the neutral player
                         addPlayer(new Player("NTRL", "Neutral", 0));

@@ -1,8 +1,9 @@
 package jemgm;
 
 import java.util.Hashtable;
+
 /**
- * Player.java
+ * Represents a player in the game. 
  *
  *
  * Created: Tue Feb 12 22:35:05 2002

@@ -6,8 +6,8 @@ import java.net.URL;
 import java.io.IOException;
 
 /**
- * Unit.java
- *
+ * Represents a unit type in the game. For unit types are in the games: 
+ * ARMY, CORPS, FLEET, SQUANDRON.
  *
  * Created: Sun Jan  7 13:45:25 2001
  *

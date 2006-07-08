@@ -4,7 +4,8 @@ import java.util.*;
 import java.io.*;
 
 /**
- * AreaDataBase.java
+ * Stores the known areas of the gameturn. Information cames from the data
+ * files, sent by the server of the other players.
  *
  *
  * Created: Sun Jan  7 14:29:53 2001

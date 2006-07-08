@@ -1,6 +1,6 @@
 package jemgm;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * AreaInformation.java
@@ -83,10 +83,10 @@ public class AreaInformation extends Area {
         setId(a.getId());
         setAreaType(a.getAreaType());
         hexNum = a.hexNum;
-        xCoords = new Vector<Integer>(a.xCoords);
-        yCoords = new Vector<Integer>(a.yCoords);
+        xCoords = new ArrayList<Integer>(a.xCoords);
+        yCoords = new ArrayList<Integer>(a.yCoords);
         setSupplyPointNum(a.getSupplyPointNum());
-        neighbours = new Vector<Integer>(a.neighbours);
+        neighbours = new ArrayList<Integer>(a.neighbours);
         setOwner(-1);        
     }
     
@@ -94,10 +94,10 @@ public class AreaInformation extends Area {
         setId(a.getId());
         setAreaType(a.getAreaType());
         hexNum = a.hexNum;
-        xCoords = new Vector<Integer>(a.xCoords);
-        yCoords = new Vector<Integer>(a.yCoords);
+        xCoords = new ArrayList<Integer>(a.xCoords);
+        yCoords = new ArrayList<Integer>(a.yCoords);
         setSupplyPointNum(a.getSupplyPointNum());
-        neighbours = new Vector<Integer>(a.neighbours);
+        neighbours = new ArrayList<Integer>(a.neighbours);
         setOwner(a.getOwner());
         setPrevOwner(a.getPrevOwner());
         setUnitOwner(a.getUnitOwner());
@@ -110,7 +110,7 @@ public class AreaInformation extends Area {
         String ret = getId() + " " + owner + " " + getAreaType() + " " +
                 getSupplyPointNum() + " ";
         for( int i=0; i<neighbours.size(); ++i ) {
-            ret += neighbours.elementAt(i) + " ";
+            ret += neighbours.get(i) + " ";
         }
         int j = neighbours.size();
         while( j < Area.AOD_MAX_NEIGHBOURS ) {

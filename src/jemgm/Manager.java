@@ -167,9 +167,10 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         northPanel.setLayout(new GridLayout(2,1));
         northPanel.add(commandPanel);
         northPanel.add(commandButtonPanel);
-        map = new HexMap(this);
-        map.setBackground(HexMap.unknownColor);
-        map.addMouseListener(new PopupListener());
+        battleField = new HexBattleFieldPanel(this);
+        battleField.setBackground(HexMap.unknownColor);
+        battleField.addMouseListener(new PopupListener());
+        //battleField.setSize(2000,2000);
         commentTextArea = new JTextArea(40,40);        
         commentTextArea.setVisible(false);
                 
@@ -189,7 +190,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         StyleConstants.setBold(s, true);        
         
         tabbedPane = new JTabbedPane();
-        tabbedPane.add("Map", map);
+        tabbedPane.add("Map", new JScrollPane(battleField, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
         tabbedPane.add("Relations", vpr);
         tabbedPane.add("Alliance headlines", allianceHeadlines);
         tabbedPane.add("Chart", Charts.getInstance(this));
@@ -219,12 +220,16 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         if( source.equals(unitImagesMenuItem) ) {
             Unit.setShowUnitImages(unitImagesMenuItem.getState());
         } else if ( source.equals(frontLinesMenuItem) ){
-            map.setShowFrontLines(frontLinesMenuItem.getState());            
+            //battleField.setShowFrontLines(frontLinesMenuItem.getState());            
+            battleField.setVisible(AbstractBattleFieldPanel.LayerType.LAYER_FRONTLINE, frontLinesMenuItem.getState());
+            battleField.setNeedRepaint(AbstractBattleFieldPanel.LayerType.LAYER_FRONTLINE, true);
         } else if ( source.equals(newAreaMenuItem) ){
-            map.setShowNewArea(newAreaMenuItem.getState());            
+            //battleField.setShowNewArea(newAreaMenuItem.getState());            
+            battleField.setVisible(AbstractBattleFieldPanel.LayerType.LAYER_NEWAREA, newAreaMenuItem.getState());
+            battleField.setNeedRepaint(AbstractBattleFieldPanel.LayerType.LAYER_NEWAREA, true);
         }
-        map.needRepaint = true;
-        map.repaint();
+        
+        battleField.repaint();
         validate();        
     }
     
@@ -242,20 +247,20 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
                 popupX = e.getX();
                 popupY = e.getY();
                 // enable/disable cancel
-                Dimension d = map.getAreaPlace(popupX, popupY);
-                AreaInformation ai = map.getAdb().getAreaInformation(map.getAdb().getId(d.width,d.height));
+                Dimension d = battleField.getAreaPlace(popupX, popupY);
+                AreaInformation ai = battleField.getAdb().getAreaInformation(battleField.getAdb().getId(d.width,d.height));
                 boolean cancelEnabled = false;
                 if( ai != null ) {
                     System.out.println("ai.getId:"+ai.getId());
-                    int index = map.getCc().getCommandIndexById(ai.getId());
+                    int index = battleField.getCc().getCommandIndexById(ai.getId());
                     if( index != -1 ) {
                         cancelEnabled = true;
                     }
                 } else {
-                    int w = map.shift(d.width,  map.getAdb().getXSize(), getGame().getShiftX());
-                    int h = map.shift(d.height, map.getAdb().getYSize(), getGame().getShiftY());
+                    int w = battleField.shift(d.width,  battleField.getAdb().getXSize(), getGame().getShiftX());
+                    int h = battleField.shift(d.height, battleField.getAdb().getYSize(), getGame().getShiftY());
                     int param=10000+w*100+h;
-                    Command c = map.getCc().getCommandByType(CommandType.SP);
+                    Command c = battleField.getCc().getCommandByType(CommandType.SP);
                     if( c != null ) {
                         int i=0;
                         while( i<c.getParamNum() && c.getIntParam(i) != param ) {
@@ -288,10 +293,10 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         } else if( source.equals(saveGameMenuItem) || source.equals(saveButton) ) {
             saveGame();
         } else if( source.equals(diplomacyMenuItem) ) {
-            Diplomacy dip = new Diplomacy(getGame(), getTurn(getActTurnNumber()).getPr(), map.getCc());
+            Diplomacy dip = new Diplomacy(getGame(), getTurn(getActTurnNumber()).getPr(), battleField.getCc());
             dip.setVisible(true);
         } else if( source.equals(victoryConditionsMenuItem) ) {
-            VictoryConditions vc = new VictoryConditions(game, map.getCc());
+            VictoryConditions vc = new VictoryConditions(game, battleField.getCc());
             vc.setVisible(true);
         } else if( source.equals(sendMenuItem) ) {
             try {
@@ -311,7 +316,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
                     }
                     
                     msg.setSubject("EMGTURN");
-                    msg.setText(map.getCc().toString());
+                    msg.setText(battleField.getCc().toString());
                     msg.setSentDate(new Date());
                     Transport.send(msg);
                     JOptionPane.showMessageDialog(this, "E-mail sent to "+getGame().getBotEmail()+" address", "E-mail", JOptionPane.INFORMATION_MESSAGE);
@@ -323,7 +328,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
             }
         } else if( source.equals(viewMenuItem) ) {
             // TODO: change it to something nicer
-            JOptionPane.showMessageDialog(this, ""+map.getCc(), "Commands", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, ""+battleField.getCc(), "Commands", JOptionPane.INFORMATION_MESSAGE);
         } else if( source.equals(emailMenuItem) ) {
             System.out.println("emailMenuItem selected");
             Emails emails = new Emails(this);
@@ -362,32 +367,32 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         } else if( source.equals(lastButton) ) {
             setActTurnNumber(getGame().getMapcoll().getLatestTurn());
         } else if( source.equals(cancelMenuItem) ) {
-            Dimension d = map.getAreaPlace(popupX, popupY);
-            AreaInformation ai = map.getAdb().getAreaInformation(map.getAdb().getId(d.width,d.height));
+            Dimension d = battleField.getAreaPlace(popupX, popupY);
+            AreaInformation ai = battleField.getAdb().getAreaInformation(battleField.getAdb().getId(d.width,d.height));
             if( ai != null ) {
                 System.out.println("ai.getId:"+ai.getId());
-                int index = map.getCc().getCommandIndexById(ai.getId());
+                int index = battleField.getCc().getCommandIndexById(ai.getId());
                 if( index != -1 ) {
-                    Command c = map.getCc().getCommand(index);
+                    Command c = battleField.getCc().getCommand(index);
                     if( c.getType() != CommandType.SP ) {
-                        map.getCc().removeCommand(index);
+                        battleField.getCc().removeCommand(index);
                     } else {
                         c.removeParam(""+ai.getId());
                         System.out.println("new c:"+c);
-                        map.getCc().addCommand(c);
-                        System.out.println("new cc:"+map.getCc());
+                        battleField.getCc().addCommand(c);
+                        System.out.println("new cc:"+battleField.getCc());
                         actCommand = null;
                         commandButtonGroup.setSelected(commandButtonGroup.getSelection(), false);
                     }
-                    map.needRepaint = true;
-                    map.repaint();
+                    battleField.setNeedRepaint(true);
+                    battleField.repaint();
                 }
             } else {
                 // cancel special spy
-                int w = map.shift(d.width,  map.getAdb().getXSize(), getGame().getShiftX());
-                int h = map.shift(d.height, map.getAdb().getYSize(), getGame().getShiftY());
+                int w = battleField.shift(d.width,  battleField.getAdb().getXSize(), getGame().getShiftX());
+                int h = battleField.shift(d.height, battleField.getAdb().getYSize(), getGame().getShiftY());
                 int param=10000+w*100+h;
-                Command c = map.getCc().getCommandByType(CommandType.SP);
+                Command c = battleField.getCc().getCommandByType(CommandType.SP);
                 if( c != null ) {
                     int i=0;
                     while( i<c.getParamNum() && c.getIntParam(i) != param ) {
@@ -404,7 +409,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
                 if( source.equals(commandButtons[i]) ) {
                     commandType = CommandType.commandTypes[i];
                     if( commandType.equals( CommandType.SP ) ) {
-                        actCommand = map.getCc().getCommandByType(CommandType.SP);
+                        actCommand = battleField.getCc().getCommandByType(CommandType.SP);
                         initSPCommand(actCommand);
                     } else {
                         actCommand = new Command(game,commandType);
@@ -506,7 +511,8 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
                     } else {
                         frontLinesMenuItem.setState(true);
                     }
-                    map.setShowFrontLines(frontLinesMenuItem.getState());
+                    //battleField.setShowFrontLines(frontLinesMenuItem.getState());
+                    battleField.setVisible(AbstractBattleFieldPanel.LayerType.LAYER_FRONTLINE, frontLinesMenuItem.getState());
                 } else if( line.startsWith("newArea:") ) {
                     // not too nice
                     if( line.indexOf("false") > -1 ) {
@@ -514,7 +520,8 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
                     } else {
                         newAreaMenuItem.setState(true);
                     }
-                    map.setShowNewArea(newAreaMenuItem.getState());                    
+                    //battleField.setShowNewArea(newAreaMenuItem.getState());                    
+                    battleField.setVisible(AbstractBattleFieldPanel.LayerType.LAYER_NEWAREA, newAreaMenuItem.getState());
                 } else if( line.startsWith("recent:") ) {
                     recents.add(line.substring("recent:".length()));
                     JMenuItem recentItem = new JMenuItem(line.substring("recent:".length()));
@@ -698,19 +705,20 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
     
     /**
      * Set the value of actTurnNumber.
+     * 
      * @param v  Value to assign to actTurnNumber.
-     * @param center Center the map
+     * @param center Center the battleField
      */
     public void setActTurnNumber(int  v, boolean center) {
         saveCommentFile(actTurnNumber);
         this.actTurnNumber = v;
         setTitle(windowTitle+"  "+getGame().getGameId()+" Turn: "+getActTurnNumber());
         Turn tt = getTurn(v);
-        map.setAdb(tt.getAreadb());
-        map.setCc(tt.getCc());
+        battleField.setAdb(tt.getAreadb());
+        battleField.setCc(tt.getCc());
         
-        int supply = map.getAdb().getSupplyPointNum(getGame().getPlayer());
-        int army = map.getAdb().getArmyStrength(getGame().getPlayer());
+        int supply = battleField.getAdb().getSupplyPointNum(getGame().getPlayer());
+        int army = battleField.getAdb().getArmyStrength(getGame().getPlayer());
         String ending = Math.abs(supply - army) == 1 ? "s" : "";
         String strengthText = "Supply: "+supply+" Army: "+army;
         if( supply > army ) {
@@ -725,24 +733,24 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         for(int p=1; p<playerNum; ++p ) {
             System.out.println("plNum:"+p);
             System.out.println("Player: "+game.getPlayer(p).getName());
-            System.out.println("Victory points: "+map.getAdb().getVictoryPoints(game.getPlayer(p)));
+            System.out.println("Victory points: "+battleField.getAdb().getVictoryPoints(game.getPlayer(p)));
         }
         
         System.out.println("A");
         if( center ) {
             System.out.println("A1");
-            AreaInformation ai = map.getAdb().getAreaInformationByOwner(getGame().getPlayer());
+            AreaInformation ai = battleField.getAdb().getAreaInformationByOwner(getGame().getPlayer());
             System.out.println("A2 "+ai);
             if( ai != null ) {
-                map.center(ai.getX(1), ai.getY(1));
+//!                battleField.center(ai.getX(1), ai.getY(1));
             } else {
-                map.needRepaint = true;
-                map.repaint();
+                battleField.setNeedRepaint(true);
+                battleField.repaint();
             }
             System.out.println("A3");
         } else {
-            map.needRepaint = true;
-            map.repaint();
+            battleField.setNeedRepaint(true);
+            battleField.repaint();
         }
         System.out.println("B");
         vpr.setPr(tt.getPr());
@@ -855,16 +863,16 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
     }
     
     private boolean isMyUnitHere(int areaId) {
-        AreaInformation ai = map.getAdb().getAreaInformation(areaId);
+        AreaInformation ai = battleField.getAdb().getAreaInformation(areaId);
         return ai.getUnitType() != 0 &&
                 ai.getUnitOwner() == getGame().getPlayer().getNum();
     }
     
     private boolean validCommand(Command c) {
-        AreaInformation ai1 = map.getAdb().getAreaInformation(c.getIntParam(0));
+        AreaInformation ai1 = battleField.getAdb().getAreaInformation(c.getIntParam(0));
         AreaInformation ai2 = null;
         if( c.getParamNum() > 1 ) {
-            ai2 = map.getAdb().getAreaInformation(c.getIntParam(1));
+            ai2 = battleField.getAdb().getAreaInformation(c.getIntParam(1));
         }
         
         CommandType ctype = c.getType();
@@ -900,10 +908,11 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         Command c = new Command(game,commandType, commandParam, getParamIndex());
         if( validCommand(c) ) {
             System.out.println("command:"+c);
-            map.getCc().addCommand(c);
-            System.out.println("cc:"+map.getCc());
-            map.needRepaint = true;
-            map.repaint();
+            battleField.getCc().addCommand(c);
+            System.out.println("cc:"+battleField.getCc());
+            battleField.setNeedRepaint(true);
+            battleField.setNeedRepaint(AbstractBattleFieldPanel.LayerType.LAYER_AREA, false);            
+            battleField.repaint();
         } else {
             System.out.println("Invalid command");
             //MessageBox.showMessage("Invalid Command");
@@ -931,10 +940,11 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
                 }
                 setParamIndex(getParamIndex()-1);
                 actCommand = new Command(game,commandType, commandParam, getParamIndex());
-                map.getCc().addCommand(actCommand); // clone??
+                battleField.getCc().addCommand(actCommand); // clone??
                 updateCommandLabel();
-                map.needRepaint = true;
-                map.repaint();
+                battleField.setNeedRepaint(true);
+                battleField.setNeedRepaint(AbstractBattleFieldPanel.LayerType.LAYER_AREA, false);                            
+                battleField.repaint();
                 return;
             }
         }
@@ -1040,7 +1050,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
     private JButton   prevButton;
     private JButton   nextButton;
     private JButton   lastButton;
-    private HexMap   map;
+    private AbstractBattleFieldPanel   battleField;
     private JTabbedPane tabbedPane;
     private JLabel    statusLabel;
     private JLabel    commandLabel;

@@ -11,14 +11,31 @@ import javax.swing.*;
  * The most important part of the screen. It shows the map, the commands...
  */
 
-public class HexMap extends JPanel implements MouseListener, MouseMotionListener {
+public class HexMap extends JLayeredPane implements MouseListener, MouseMotionListener {
     
     Image capitalImage =  Toolkit.getDefaultToolkit().getImage( "images/capital.png" );
+    
+    // Panels for each layer
+    JPanel          hexLayer = new HexLayer();
+    JPanel          commandLayer = new CommandLayer();
+    
 
     public HexMap(Manager aodm) {
         addMouseListener(this);
         addMouseMotionListener(this);
-        setAodm(aodm);
+        setAodm(aodm);        
+        commandLayer.setOpaque(false);
+        hexLayer.setOpaque(false);
+        //hexLayer.setPreferredSize( new Dimension(2000,2000));                
+        //hexLayer.setMinimumSize( new Dimension(2000,2000));
+        hexLayer.setSize(2000,2000);
+        //commandLayer.setPreferredSize(new Dimension(2000,2000));
+        //commandLayer.setMinimumSize(new Dimension(2000,2000));
+        commandLayer.setSize(2000,2000);
+        setPreferredSize(new Dimension(2000,2000));
+        setSize(2000,2000);
+        add(hexLayer, 1);
+        add(commandLayer, 0);
     }
     
     Manager aodm;
@@ -80,139 +97,46 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         this.cc = v;
     }
     
+/*    public void paint(Graphics g) {     
+        System.out.println("hm paint");
+            layeredPane.repaint();            
+    }*/
     
-    public void paint(Graphics g) {
+    /*public void paint(Graphics g) {
         grW = getWidth();
         grH = getHeight();
-        if( imageBuffer == null && adb.getXSize() != 0 ) {
+        commandLayer.repaint();*/
+        /*
+        if( imageBuffer == null && adb.getXSize() != 0 ) {            
             int xsize = (int)(2*adb.getXSize()*xdiff);
             int ysize = (int)(2*adb.getYSize()*ydiff);
             imageBuffer = createImage(xsize, ysize);
             graphicsBuffer = (Graphics2D)imageBuffer.getGraphics();
             graphicsBuffer.setClip(0, 0, xsize, ysize);
             offScreen = true;
+            
+            commandLayer = new CommandLayer();
+            
+            
         }
         if( offScreen ) {
             if( needRepaint ) {
-                realPaint(graphicsBuffer);
+//                realPaint(hexGraphicsBuffer);
+                commandLayer.repaint();
                 needRepaint = false;
             }
             g.drawImage(imageBuffer, -offX, -offY, this);
         } else {
             realPaint((Graphics2D)g);
-        }
-    }
+        }*/
+    /*}*/
     
     /**
-     * This is the real paint method.
+     * Draw the command lines
      */
-    public void realPaint(Graphics2D g) {
-
-        if( adb.getXSize() == 0 ) {
-            // not yet initializes
-            return;
-        }
-        PlayersRelation plr = aodm.getTurn(aodm.getActTurnNumber()).getPr();
-        
-        g.setColor(getBackground());
-        g.fillRect(0, 0, (int)(2*adb.getXSize()*xdiff), (int)(2*adb.getYSize()*ydiff));
-        g.setColor(borderColor);
-        
-        ySize = adb.getYSize();
-        if( aodm.getGame() != null && aodm.getGame().getGameType().wordWrapY() ) {
-            ySize *= 2;
-        }
-        // main loop to draw the board
-        for( int i=1; i<=2*adb.getXSize(); ++i ) {
-            for( int j=1; j<=ySize; ++j ) {
-                int reali = ((i-1) % adb.getXSize()) + 1;
-                int realj = ((j-1) % adb.getYSize()) + 1;
-                int xpoints[] = new int[6];
-                for( int xi = 0; xi<6; ++xi ) {
-                    xpoints[xi] = (int)(topx + xhex[xi]+i*xdiff);
-                }
-                int ypoints[] = new int[6];
-                double jj = j - (reali % 2)*0.5;
-                for( int yi = 0; yi<6; ++yi ) {
-                    ypoints[yi] = (int)(topy + yhex[yi]+jj*ydiff);
-                }
-                AreaInformation ai = adb.getAreaInformation(adb.getId(reali,realj));
-                if( ai != null ) {
-                    g.setColor(getColor(ai));
-                    g.fillPolygon(xpoints, ypoints, 6);
-                    g.setColor(borderColor);
-                    g.drawPolygon(xpoints, ypoints, 6);
-                    if( isShowNewArea() && ai.getAreaType() != Area.AREA_TYPE_SEA && 
-                        ai.getOwner() != ai.getPrevOwner()  &&
-                        ai.getOwner() != 0 ) {
-//                        System.out.println("new area: "+ai.getId());
-                        int x1 = (int)(topx-2*size*cos30+i*xdiff);
-                        int y1 = (int)(topy+jj*ydiff-0.5*ydiff);
-        
-                        g.drawImage(newAreaImage, x1, y1, null);
-                    }
-                    if( supplyDraw && ai != null && ai.getX(1) == reali && ai.getY(1) == realj &&
-                            ai.getSupplyPointNum() != 0 ) {
-                        if( drawUnitHere(ai, reali, realj) ||
-                                drawNewUnitHere(ai, reali, realj)) {
-                            if( ai.isCapital() ) {
-                                drawCapital(g, i, j, getColor(ai.getOwner()), false);
-                            } else {
-                                drawSmallSupplyPoints(g, i, j, ai.getSupplyPointNum());
-                            }
-                        } else {
-                            if( ai.isCapital() ) {
-                                drawCapital(g, i, j, getColor(ai.getOwner()), true);
-                            } else {
-                                drawSupplyPoints(g, i, j, ai.getSupplyPointNum());
-                            }
-                        }
-                    }
-                    if( numberDraw && ai != null && ai.getX(1) == reali && ai.getY(1) == realj ) {
-                        drawNumber(g, i, j, ""+ai.getId());
-                    }
-                    if( drawUnitHere(ai, reali, realj) ) {
-                        drawUnit(g, i, j, ai.getUnitType(), getColor(ai.getUnitOwner()), borderColor);
-                    }
-                    // delete the lines between the hexes, if they are in the same area.
-                    for( int ni=-1; ni<=1; ++ni) {
-                        for( int nj=-1; nj<=1; ++nj ) {
-                            if( ni == 0 && nj == 0) { 
-                                continue;
-                            }
-                            int nri = ((reali+ni-1) % adb.getXSize())+1;
-                            int nrj = ((realj+nj-1) % adb.getYSize())+1;
-                            if( adb.getId(nri, nrj) == ai.getId() ) {
-                                drawLineBetween(g, reali, realj, nri, nrj, getColor(ai));
-                            }
-                            AreaInformation nai = adb.getAreaInformation(adb.getId(nri, nrj));
-                            if( showFrontLines && nai != null && ai.getOwner() >= 1 && nai.getOwner() >= 1 &&
-                                    plr.getSimpleRelation(ai.getOwner(), nai.getOwner()) == PlayersRelation.RelationType.WAR) {
-                                drawLineBetween(g, reali, realj, nri, nrj, frontLineColor, frontLineStroke);
-                            }
-                            if( showFrontLines && nai != null && ai.getOwner() >= 1 && nai.getOwner() >= 1 &&
-                                    plr.getSimpleRelation(ai.getOwner(), nai.getOwner()) == PlayersRelation.RelationType.ALLY) {
-                                drawLineBetween(g, reali, realj, nri, nrj, friendlyLineColor, frontLineStroke);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-//         if( adb.getXSize() != 0) {
-//             for( int ainum = 1; ainum<adb.getXSize()*adb.getYSize(); ++ainum ) {
-//                 AreaInformation ai = adb.getAreaInformation(ainum);
-//                 if( ai != null && ai.getX(2) != 0 ) {
-//                     drawLineBetween(g, ai.getX(1), ai.getY(1), ai.getX(2), ai.getY(2), getColor(ai));
-//                     if( ai.getX(3) != 0 ) {
-//                         drawLineBetween(g, ai.getX(1), ai.getY(1), ai.getX(3), ai.getY(3), getColor(ai));
-//                         drawLineBetween(g, ai.getX(2), ai.getY(2), ai.getX(3), ai.getY(3), getColor(ai));
-//                     }
-//                 }
-//             }
-//         }
-        
+    public void paintCommands(Graphics2D g) {
+        g.setColor(Color.BLUE);
+        g.drawRect(0,0, 100, 100);
         // commands
         for( int i=0; cc != null && i<cc.getCommandNum(); ++i ) {
             Command c = cc.getCommand(i);
@@ -325,7 +249,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
                 drawUnit(g, x1, y1+adb.getYSize(), unit, getColor(cai.getOwner()), bColor, c.getType().color);
                 drawUnit(g, x1+adb.getXSize(), y1+adb.getYSize(), unit, getColor(cai.getOwner()), bColor, c.getType().color);
             } else if( c.getType().equals(CommandType.SP) ) {
-                System.out.println("paint spies "+c.getParamNum());
+                //System.out.println("paint spies "+c.getParamNum());
                 for( int si=0; si<c.getParamNum(); ++si ) {
                     AreaInformation sai = adb.getAreaInformation(c.getIntParam(si));
                     if( sai != null ) {
@@ -336,8 +260,124 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
                         drawSpyOne( g, x, y);
                     }
                 }
+            }            
+        }
+    }
+    
+    /**
+     * This is the real paint method.
+     */
+    public void realPaint(Graphics2D g) {
+
+        g.setColor(Color.RED);
+        g.drawRect(40,40, 300, 300);
+        
+        if( adb.getXSize() == 0 ) {
+            // not yet initializes
+            return;
+        }
+        PlayersRelation plr = aodm.getTurn(aodm.getActTurnNumber()).getPr();
+        
+        g.setColor(getBackground());
+        g.fillRect(0, 0, (int)(2*adb.getXSize()*xdiff), (int)(2*adb.getYSize()*ydiff));
+        g.setColor(borderColor);
+        
+        ySize = adb.getYSize();
+        if( aodm.getGame() != null && aodm.getGame().getGameType().wordWrapY() ) {
+            ySize *= 2;
+        }
+        // main loop to draw the board
+        for( int i=1; i<=2*adb.getXSize(); ++i ) {
+            for( int j=1; j<=ySize; ++j ) {
+                int reali = ((i-1) % adb.getXSize()) + 1;
+                int realj = ((j-1) % adb.getYSize()) + 1;
+                int xpoints[] = new int[6];
+                for( int xi = 0; xi<6; ++xi ) {
+                    xpoints[xi] = (int)(topx + xhex[xi]+i*xdiff);
+                }
+                int ypoints[] = new int[6];
+                double jj = j - (reali % 2)*0.5;
+                for( int yi = 0; yi<6; ++yi ) {
+                    ypoints[yi] = (int)(topy + yhex[yi]+jj*ydiff);
+                }
+                AreaInformation ai = adb.getAreaInformation(adb.getId(reali,realj));
+                if( ai != null ) {
+                    g.setColor(getColor(ai));
+                    g.fillPolygon(xpoints, ypoints, 6);
+                    g.setColor(borderColor);
+                    g.drawPolygon(xpoints, ypoints, 6);
+                    if( isShowNewArea() && ai.getAreaType() != Area.AREA_TYPE_SEA && 
+                        ai.getOwner() != ai.getPrevOwner()  &&
+                        ai.getOwner() != 0 ) {
+//                        System.out.println("new area: "+ai.getId());
+                        int x1 = (int)(topx-2*size*cos30+i*xdiff);
+                        int y1 = (int)(topy+jj*ydiff-0.5*ydiff);
+        
+                        g.drawImage(newAreaImage, x1, y1, null);
+                    }
+                    if( supplyDraw && ai != null && ai.getX(1) == reali && ai.getY(1) == realj &&
+                            ai.getSupplyPointNum() != 0 ) {
+                        if( drawUnitHere(ai, reali, realj) ||
+                                drawNewUnitHere(ai, reali, realj)) {
+                            if( ai.isCapital() ) {
+                                drawCapital(g, i, j, getColor(ai.getOwner()), false);
+                            } else {
+                                drawSmallSupplyPoints(g, i, j, ai.getSupplyPointNum());
+                            }
+                        } else {
+                            if( ai.isCapital() ) {
+                                drawCapital(g, i, j, getColor(ai.getOwner()), true);
+                            } else {
+                                drawSupplyPoints(g, i, j, ai.getSupplyPointNum());
+                            }
+                        }
+                    }
+                    if( numberDraw && ai != null && ai.getX(1) == reali && ai.getY(1) == realj ) {
+                        drawNumber(g, i, j, ""+ai.getId());
+                    }
+                    if( drawUnitHere(ai, reali, realj) ) {
+                        drawUnit(g, i, j, ai.getUnitType(), getColor(ai.getUnitOwner()), borderColor);
+                    }
+                    // delete the lines between the hexes, if they are in the same area.
+                    for( int ni=-1; ni<=1; ++ni) {
+                        for( int nj=-1; nj<=1; ++nj ) {
+                            if( ni == 0 && nj == 0) { 
+                                continue;
+                            }
+                            int nri = ((reali+ni-1) % adb.getXSize())+1;
+                            int nrj = ((realj+nj-1) % adb.getYSize())+1;
+                            if( adb.getId(nri, nrj) == ai.getId() ) {
+                                drawLineBetween(g, reali, realj, nri, nrj, getColor(ai));
+                            }
+                            AreaInformation nai = adb.getAreaInformation(adb.getId(nri, nrj));
+                            if( showFrontLines && nai != null && ai.getOwner() >= 1 && nai.getOwner() >= 1 &&
+                                    plr.getSimpleRelation(ai.getOwner(), nai.getOwner()) == PlayersRelation.RelationType.WAR) {
+                                drawLineBetween(g, reali, realj, nri, nrj, frontLineColor, frontLineStroke);
+                            }
+                            if( showFrontLines && nai != null && ai.getOwner() >= 1 && nai.getOwner() >= 1 &&
+                                    plr.getSimpleRelation(ai.getOwner(), nai.getOwner()) == PlayersRelation.RelationType.ALLY) {
+                                drawLineBetween(g, reali, realj, nri, nrj, friendlyLineColor, frontLineStroke);
+                            }
+                        }
+                    }
+                }
             }
         }
+        
+//         if( adb.getXSize() != 0) {
+//             for( int ainum = 1; ainum<adb.getXSize()*adb.getYSize(); ++ainum ) {
+//                 AreaInformation ai = adb.getAreaInformation(ainum);
+//                 if( ai != null && ai.getX(2) != 0 ) {
+//                     drawLineBetween(g, ai.getX(1), ai.getY(1), ai.getX(2), ai.getY(2), getColor(ai));
+//                     if( ai.getX(3) != 0 ) {
+//                         drawLineBetween(g, ai.getX(1), ai.getY(1), ai.getX(3), ai.getY(3), getColor(ai));
+//                         drawLineBetween(g, ai.getX(2), ai.getY(2), ai.getX(3), ai.getY(3), getColor(ai));
+//                     }
+//                 }
+//             }
+//         }
+
+        //paintCommands(g);
     }
     
     public int shift(int raw, int size, int shift) {
@@ -803,7 +843,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
         if( offY < 2*size ) {
             offY += adb.getYSize()*ydiff;
         }
-        
+        needRepaint = true;
         repaint();
     }
     
@@ -843,6 +883,7 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
     private boolean  offScreen = false;
     private Image    imageBuffer;
     private Graphics2D graphicsBuffer;
+    private Graphics2D hexGraphicsBuffer;
     public  boolean  needRepaint = true;
     
     private int dragStartX;
@@ -876,5 +917,26 @@ public class HexMap extends JPanel implements MouseListener, MouseMotionListener
     public void setShowNewArea(boolean showNewArea) {
         this.showNewArea = showNewArea;
     }
+    
+    public class CommandLayer extends JPanel {
+        public void paint(Graphics g) {     
+            System.out.println("paint commands");
+            if( needRepaint ) {
+                paintCommands((Graphics2D)g);
+                needRepaint = false;
+            }
+        }
+    }
+    
+    public class HexLayer extends JPanel {
+        public void paint(Graphics g) {        
+            System.out.println("paint hex ?");
+            if( needRepaint ) {
+                System.out.println("yes paint");
+                realPaint((Graphics2D)g);
+                needRepaint = false;
+            }
+        }
+    }    
 
 } // HexMap

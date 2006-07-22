@@ -585,8 +585,8 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
             return;
         }
         
-        System.out.println("d:"+fc.getCurrentDirectory());
-        System.out.println("f:"+fc.getSelectedFile());
+        //System.out.println("d:"+fc.getCurrentDirectory());
+        //System.out.println("f:"+fc.getSelectedFile());
         String fileName = fc.getSelectedFile().getPath();
         openGame(fc.getCurrentDirectory(), fc.getSelectedFile());
     }

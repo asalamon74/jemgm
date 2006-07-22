@@ -172,7 +172,7 @@ public abstract class AbstractBattleFieldPanel extends JLayeredPane{
             if( !visible ) {
                 return;
             }
-            if( imageBuffer == null && xPixels != 0 && false) { 
+            if( imageBuffer == null && xPixels != 0 ) { 
                 // TYPE_INT_ARGB supports transparency
                 imageBuffer = new BufferedImage(xPixels, yPixels, BufferedImage.TYPE_INT_ARGB);
                 graphicsBuffer = (Graphics2D)imageBuffer.getGraphics();

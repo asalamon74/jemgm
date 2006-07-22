@@ -42,7 +42,10 @@ public class HexBattleFieldPanel extends AbstractBattleFieldPanel {
     public void init() {
         System.out.println("init");
         int xPixels = (int)(2*getAdb().getXSize()*xdiff);
-        int yPixels = (int)(2*getAdb().getYSize()*ydiff);
+        int yPixels = (int)(getAdb().getYSize()*ydiff);
+        if( getAodm().getGame().getGameType().wordWrapY() ) {
+            yPixels *= 2;
+        }
         System.out.println("xp:"+xPixels+" yp:"+yPixels);
         init( xPixels, yPixels);
         setPreferredSize(new Dimension(xPixels, yPixels));
@@ -202,6 +205,8 @@ public class HexBattleFieldPanel extends AbstractBattleFieldPanel {
         private Image capitalImage =  Toolkit.getDefaultToolkit().getImage( "images/capital.png" ); 
         private BasicStroke thickLineStroke = new BasicStroke(1);
         
+        private int yLoop;
+        
         /**
          * Draws the id number of an area.
          */
@@ -324,31 +329,22 @@ public class HexBattleFieldPanel extends AbstractBattleFieldPanel {
         
         private void drawLineBetween(Graphics2D g, int x1, int y1, int x2, int y2, Color c, Stroke stroke) {
             int line = getAdjLine(x1, y1, x2, y2);
-            if( x1 == 31 && y1 == 26) {
-                System.out.printf("x2: %d y2: %d line: %d\n", x2, y2, line);
-            }
             double jj = y1 - (x1 % 2)*0.5;
-            
+        
+            double newtopx, newtopy;
+            int lx1,lx2,ly1,ly2;
             if( line != 0 ) {
                 Stroke oldStroke = g.getStroke();
                 g.setColor(c);
+                g.setStroke(stroke);
                 for( int i=0;i<2; ++i ) {
-                    for( int j=0; j<2; ++j ) {
-                        double newtopx = topx + i*getAdb().getXSize()*xdiff;
-                        double newtopy = topy + j*getAdb().getYSize()*ydiff;
-                        int lx1 = (int)(newtopx+xhex[line-1]+x1*xdiff);
-                        int ly1 = (int)(newtopy+yhex[line-1]+jj*ydiff);
-                        int lx2 = (int)(newtopx+xhex[line % 6]+x1*xdiff);
-                        int ly2 = (int)(newtopy+yhex[line % 6]+jj*ydiff);
-                        
-                    /*
-                    if( thickness == 1 ) {
-                        g.drawLine(lx1,ly1,lx2, ly2);
-                    } else {
-                        DrawUtil.drawThickLine(g, lx1, ly1, lx2, ly2, thickness, g.getColor());
-                    }
-                     */
-                        g.setStroke(stroke);
+                    newtopx = topx + i*getAdb().getXSize()*xdiff;
+                    lx1 = (int)(newtopx+xhex[line-1]+x1*xdiff);
+                    lx2 = (int)(newtopx+xhex[line % 6]+x1*xdiff);
+                    for( int j=0; j<yLoop; ++j ) {                        
+                        newtopy = topy + j*getAdb().getYSize()*ydiff;                        
+                        ly1 = (int)(newtopy+yhex[line-1]+jj*ydiff);                        
+                        ly2 = (int)(newtopy+yhex[line % 6]+jj*ydiff);                                                
                         g.drawLine(lx1,ly1,lx2, ly2);
                     }
                 }
@@ -374,19 +370,25 @@ public class HexBattleFieldPanel extends AbstractBattleFieldPanel {
             g.setColor(borderColor);
             
             int ySize = getAdb().getYSize();
+            yLoop = 1;
             if( getAodm().getGame() != null && getAodm().getGame().getGameType().wordWrapY() ) {
                 ySize *= 2;
+                yLoop = 2;
             }
-            // main loop to draw the board
+            int reali, realj;
+            int xpoints[] = new int[6];
+            int ypoints[] = new int[6];
+            int nri,nrj;
+            
+            // first loop the draw the hex poligons, and the colored hexes
             for( int i=1; i<=2*getAdb().getXSize(); ++i ) {
-                for( int j=1; j<=ySize; ++j ) {
-                    int reali = ((i-1) % getAdb().getXSize()) + 1;
-                    int realj = ((j-1) % getAdb().getYSize()) + 1;
-                    int xpoints[] = new int[6];
-                    for( int xi = 0; xi<6; ++xi ) {
-                        xpoints[xi] = (int)(topx + xhex[xi]+i*xdiff);
-                    }
-                    int ypoints[] = new int[6];
+                reali = ((i-1) % getAdb().getXSize()) + 1;
+                for( int xi = 0; xi<6; ++xi ) {
+                    xpoints[xi] = (int)(topx + xhex[xi]+i*xdiff);
+                }
+                for( int j=1; j<=ySize; ++j ) {                    
+                    realj = ((j-1) % getAdb().getYSize()) + 1;                    
+                                        
                     double jj = j - (reali % 2)*0.5;
                     for( int yi = 0; yi<6; ++yi ) {
                         ypoints[yi] = (int)(topy + yhex[yi]+jj*ydiff);
@@ -397,6 +399,20 @@ public class HexBattleFieldPanel extends AbstractBattleFieldPanel {
                         g.fillPolygon(xpoints, ypoints, 6);
                         g.setColor(borderColor);
                         g.drawPolygon(xpoints, ypoints, 6);
+                    }                    
+                }
+            }
+            // main loop to draw the board
+            for( int i=1; i<=2*getAdb().getXSize(); ++i ) {
+                reali = ((i-1) % getAdb().getXSize()) + 1;
+                for( int j=1; j<=ySize; ++j ) {                    
+                    realj = ((j-1) % getAdb().getYSize()) + 1;                    
+                                        
+                    double jj = j - (reali % 2)*0.5;
+                    AreaInformation ai = getAdb().getAreaInformation(getAdb().getId(reali,realj));
+                    if( ai != null ) {
+
+                        g.setColor(borderColor);
                         if( supplyDraw && ai != null && ai.getX(1) == reali && ai.getY(1) == realj &&
                                 ai.getSupplyPointNum() != 0 ) {
                             if( drawUnitHere(ai, reali, realj) ||
@@ -423,11 +439,11 @@ public class HexBattleFieldPanel extends AbstractBattleFieldPanel {
                         // delete the lines between the hexes, if they are in the same area.
                         for( int ni=-1; ni<=1; ++ni) {
                             for( int nj=-1; nj<=1; ++nj ) {
-                                if( ni == 0 && nj == 0) {
+                                if( ni <= 0 && nj <= 0 ) {
                                     continue;
                                 }
-                                int nri = ((reali+ni-1) % getAdb().getXSize())+1;
-                                int nrj = ((realj+nj-1) % getAdb().getYSize())+1;
+                                nri = ((reali+ni-1) % getAdb().getXSize())+1;
+                                nrj = ((realj+nj-1) % getAdb().getYSize())+1;
                                 if( getAdb().getId(nri, nrj) == ai.getId() ) {
                                     drawLineBetween(g, reali, realj, nri, nrj, getColor(ai));
                                 }

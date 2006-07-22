@@ -110,30 +110,31 @@ public class Map  {
         int relId=0;
         try {
             BufferedReader reader = new BufferedReader(new FileReader(game.getDirectory()+getFileName()));
+            // simple matches replaced by String.indexOf, since it's much faster
             while( (line = reader.readLine()) != null ) {
-                System.out.println("line:"+line);
-                if( line.matches(".*Current Status.*") ) {
+//                System.out.println("line:"+line);
+                if(  line.indexOf("Current Status") != - 1) {
                     state = ParserState.AREA;
                     continue;
-                } else if( line.matches(".*RELATIONS.*")) {
+                } else if( line.indexOf("RELATIONS") != -1 ) {
                     state = ParserState.RELATIONS;
                     continue;
-                } else if( line.matches(".*ALLIANCE HEADLINES.*")) {
+                } else if( line.indexOf("ALLIANCE HEADLINES") != -1) {
                     state = ParserState.ALLIANCE_HEADLINES;
                     continue;
-                } else if( line.matches(".*HEADLINES.*")) {
+                } else if( line.indexOf("HEADLINES") != -1) {
                     state = ParserState.HEADLINES;
                     continue;
                 } else if( line.matches(".*GLOBAL DIPLOMACY.*GAME.*")) {
                     state = ParserState.HEADER;
-                } else if( line.matches(".*RESULTS OF COMMANDS REPORTS.*")) {
+                } else if( line.indexOf("RESULTS OF COMMANDS REPORTS") != -1 ) {
                     state = ParserState.COMMAND_REPORTS;
-                } else if( line.matches(".*POSSIBLE COMMANDS.*")) {
+                } else if( line.indexOf("POSSIBLE COMMANDS") != -1 ) {
                     state = ParserState.POSSIBLE_COMMANDS;
-                } else if( line.matches(".*E-MAIL GAMES:.*")) {
+                } else if( line.indexOf("E-MAIL GAMES:") != -1 ) {
                     plNum = 0;
                     state = ParserState.EMAILS;
-                } else if( line.matches(".*GAME SETUP REPORT:.*")) {
+                } else if( line.indexOf("GAME SETUP REPORT:") != -1 ) {
                     plNum=0;
                     state = ParserState.GAME_SETUP;
                 }
@@ -180,14 +181,14 @@ public class Map  {
 //                        }
                         break;
                     case GAME_SETUP:
-                        if( line.matches(".*1st.*") ) {
+                        if( line.indexOf("1st") != -1 ) {
                             StringTokenizer st = new StringTokenizer(line, "|");
                             Player p = game.getPlayer(++plNum);
                             p.setName(st.nextToken());
                         }
                         break;
                     case AREA:
-                        System.out.println("area");
+//                        System.out.println("area");
                         if( !line.matches(".*\\d.*") ) {
                             // no number in the line, we can skip it.
                             continue;

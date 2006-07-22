@@ -15,13 +15,13 @@ import java.io.*;
  */
 public class AreaDataBase  {
     
-    protected Hashtable<Integer, AreaInformation> areas;
+    protected HashMap<Integer, AreaInformation> areas;
     protected int[][]   areaNums;
     protected Game   game;
     
     public AreaDataBase(Game game) {
         this.game = game;
-        areas = new Hashtable<Integer, AreaInformation>();
+        areas = new HashMap<Integer, AreaInformation>();
         if( xSize != 0 && ySize != 0 ) {
             // we already know the size
             areaNums = new int[xSize][ySize];
@@ -34,7 +34,7 @@ public class AreaDataBase  {
         StringTokenizer st;
         
         this.game = game;
-        areas = new Hashtable<Integer, AreaInformation>();
+        areas = new HashMap<Integer, AreaInformation>();
         if( this.xSize == 0 || this.ySize == 0 ) {
             this.xSize = xSize;
             this.ySize = ySize;
@@ -200,16 +200,16 @@ public class AreaDataBase  {
     
     public String createWinAODFile() {
         int size = areas.size();
-        Integer keys[] = new Integer[size];
+        /*Integer keys[] = new Integer[size];
         Enumeration enumer = areas.keys();
         for( int i=0; i<size; ++i ) {
             keys[i] = (Integer)enumer.nextElement();
         }
+        int actPlayerId = game.getPlayer().getNum();        
         for( int i=0; i<size-1; ++i ) {
             for( int j=i+1; j<size; ++j ) {
                 AreaInformation ai1 = areas.get(keys[i]);
                 AreaInformation ai2 = areas.get(keys[j]);
-                int actPlayerId = game.getPlayer().getNum();
                 if( (ai2.getOwner() ==  actPlayerId && ai1.getOwner() != actPlayerId ) ||
                         ( ai2.getOwner() == actPlayerId && ai1.getOwner() == actPlayerId &&
                         ai2.getId() < ai1.getId() ) ||
@@ -220,11 +220,15 @@ public class AreaDataBase  {
                     keys[j] = swap;
                 }
             }
-        }
+        }*/
+        ArrayList<Integer> areaKeys = new ArrayList<Integer>(areas.keySet());
+        Collections.sort(areaKeys);
+        Iterator<Integer> sortedIterator = areaKeys.iterator();
         String ret="Number of Areas =, ";
         ret +=size+"\r\n";
         for( int i=0; i<size; ++i ){
-            ret += areas.get(keys[i]).createWinAODFile(game.getPlayerNum());
+            //ret += areas.get(keys[i]).createWinAODFile(game.getPlayerNum());
+            ret += areas.get(sortedIterator.next()).createWinAODFile(game.getPlayerNum());
         }
         return ret;
     }
@@ -286,10 +290,18 @@ public class AreaDataBase  {
      */
     public AreaInformation getAreaInformationByOwner(Player p) {
         int pid = p.getNum();
-        Enumeration enumer = areas.elements();
+        /*Enumeration enumer = areas.elements();
         AreaInformation ai = null;
         while( enumer.hasMoreElements() ) {
             ai = (AreaInformation)enumer.nextElement();
+            if( ai.getOwner() == pid ) {
+                return ai;
+            }
+        }*/
+        AreaInformation ai;
+        Iterator<AreaInformation> iterator = areas.values().iterator();
+        while( iterator.hasNext() ) {
+            ai = iterator.next();
             if( ai.getOwner() == pid ) {
                 return ai;
             }
@@ -299,11 +311,20 @@ public class AreaDataBase  {
     
     public int getSupplyPointNum(Player p) {
         int pid = p.getNum();
-        Enumeration enumer = areas.elements();
+        /*Enumeration enumer = areas.elements();
         AreaInformation ai = null;
         int supplyPoints = 0;
         while( enumer.hasMoreElements() ) {
             ai = (AreaInformation)enumer.nextElement();
+            if( ai.getOwner() == pid ) {
+                supplyPoints += ai.getSupplyPointNum();
+            }
+        }*/
+        int supplyPoints=0;
+        AreaInformation ai;
+        Iterator<AreaInformation> iterator = areas.values().iterator();
+        while( iterator.hasNext() ) {
+            ai = iterator.next();
             if( ai.getOwner() == pid ) {
                 supplyPoints += ai.getSupplyPointNum();
             }
@@ -313,11 +334,22 @@ public class AreaDataBase  {
     
     public int getLandAreasNum(Player p) {
         int pid = p.getNum();
-        Enumeration enumer = areas.elements();
+        /*Enumeration enumer = areas.elements();
         int landAreasNum = 0;
         AreaInformation ai = null;
         while( enumer.hasMoreElements() ) {
             ai = (AreaInformation)enumer.nextElement();
+            if( ai.getOwner() == pid &&
+                    (ai.getAreaType() == Area.AREA_TYPE_LAND ||
+                    ai.getAreaType() == Area.AREA_TYPE_COSTAL) ) {
+                ++landAreasNum;
+            }
+        }*/
+        int landAreasNum=0;
+        AreaInformation ai;
+        Iterator<AreaInformation> iterator = areas.values().iterator();
+        while( iterator.hasNext() ) {
+            ai = iterator.next();
             if( ai.getOwner() == pid &&
                     (ai.getAreaType() == Area.AREA_TYPE_LAND ||
                     ai.getAreaType() == Area.AREA_TYPE_COSTAL) ) {
@@ -329,7 +361,7 @@ public class AreaDataBase  {
     
     public int getSeaAreasNum(Player p) {
         int pid = p.getNum();
-        Enumeration enumer = areas.elements();
+        /*Enumeration enumer = areas.elements();
         int seaAreasNum = 0;
         AreaInformation ai = null;
         while( enumer.hasMoreElements() ) {
@@ -338,17 +370,36 @@ public class AreaDataBase  {
                     ai.getAreaType() == Area.AREA_TYPE_SEA ) {
                 ++seaAreasNum;
             }
-        }
+        }*/
+        int seaAreasNum=0;
+        AreaInformation ai;
+        Iterator<AreaInformation> iterator = areas.values().iterator();
+        while( iterator.hasNext() ) {
+            ai = iterator.next();
+            if( ai.getUnitOwner() == pid &&
+                    ai.getAreaType() == Area.AREA_TYPE_SEA ) {
+                ++seaAreasNum;
+            }
+        }        
         return seaAreasNum;
     }
     
     public int getArmyStrength(Player p) {
         int pid = p.getNum();
-        Enumeration enumer = areas.elements();
+        /*Enumeration enumer = areas.elements();
         AreaInformation ai = null;
         int armyStrength = 0;
         while( enumer.hasMoreElements() ) {
             ai = (AreaInformation)enumer.nextElement();
+            if( ai.getUnitOwner() == pid ) {
+                armyStrength += Unit.getUnit(ai.getUnitType()).getStrength();
+            }
+        }*/
+        int armyStrength=0;
+        AreaInformation ai;
+        Iterator<AreaInformation> iterator = areas.values().iterator();
+        while( iterator.hasNext() ) {
+            ai = iterator.next();
             if( ai.getUnitOwner() == pid ) {
                 armyStrength += Unit.getUnit(ai.getUnitType()).getStrength();
             }
@@ -364,10 +415,24 @@ public class AreaDataBase  {
     }
     
     public void calculatePrevOwners(AreaDataBase oldadb) {
-        Enumeration enumer = areas.elements();
+/*        Enumeration enumer = areas.elements();
         AreaInformation ai, oldai;
         while( enumer.hasMoreElements() ) {
             ai = (AreaInformation)enumer.nextElement();
+            if( oldadb != null ) {
+                oldai = oldadb.getAreaInformation(ai.getId());
+                if( oldai != null ) {
+                    ai.setPrevOwner(oldai.getOwner());
+                }
+            } else {
+                // todo: check
+                ai.setPrevOwner(ai.getOwner());
+            }
+        }*/        
+        Iterator<AreaInformation> iterator = areas.values().iterator();
+        AreaInformation ai, oldai;
+        while( iterator.hasNext() ) {
+            ai = iterator.next();
             if( oldadb != null ) {
                 oldai = oldadb.getAreaInformation(ai.getId());
                 if( oldai != null ) {

@@ -105,7 +105,7 @@ public class Map  {
         if( !headerProcess ) {
             state = ParserState.AREA;
         }
-        Vector<String> headLines  = new Vector<String>();
+        ArrayList<String> headLines  = new ArrayList<String>();
         int plNum=0;
         int relId=0;
         try {

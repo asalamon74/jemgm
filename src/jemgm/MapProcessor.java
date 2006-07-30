@@ -1,20 +1,28 @@
-package jemgm;
-
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
-
-/**
- * AODMap.java
+/*
+ * MapProcessor.java
  *
+ * Created on July 30, 2006, 7:32 PM
  *
- * Created: Fri Feb 15 20:49:47 2002
- *
- * @author Salamon Andras
- * @version
+ * To change this template, choose Tools | Template Manager
+ * and open the template in the editor.
  */
 
-public class Map  {
+package jemgm;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ *
+ * @author salamon
+ */
+public class MapProcessor {
     
     public enum ParserState {NOT_STARTED,
     EMAILS,
@@ -27,77 +35,18 @@ public class Map  {
     COMMAND_REPORTS,
     POSSIBLE_COMMANDS};
     
-    public Map(int turnNum, String fileName, Player p) {
-        setTurnNum(turnNum);
-        setFileName(fileName);
-        setPlayer(p);
-    }
     
-    int turnNum;
-    
-    /**
-     * Get the value of turnNum.
-     * @return Value of turnNum.
+    /** 
+     * Noone create MapProcessor instance, since it has
+     * only static method.
      */
-    public int getTurnNum() {
-        return turnNum;
-    }
-    
-    /**
-     * Set the value of turnNum.
-     * @param v  Value to assign to turnNum.
-     */
-    public void setTurnNum(int  v) {
-        this.turnNum = v;
-    }
-    
-    
-    String fileName;
-    
-    /**
-     * Get the value of fileName.
-     * @return Value of fileName.
-     */
-    public String getFileName() {
-        return fileName;
-    }
-    
-    /**
-     * Set the value of fileName.
-     * @param v  Value to assign to fileName.
-     */
-    public void setFileName(String  v) {
-        this.fileName = v;
-    }
-    
-    
-    Player player;
-    
-    /**
-     * Get the value of player.
-     * @return Value of player.
-     */
-    public Player getPlayer() {
-        return player;
-    }
-    
-    /**
-     * Set the value of player.
-     * @param v  Value to assign to player.
-     */
-    public void setPlayer(Player  v) {
-        this.player = v;
-    }
-    
-    public String toString() {
-        Player p = getPlayer();
-        return getTurnNum() + " : " +getFileName() + " " + (p == null ? "" : ""+p.getName().charAt(0));
+    private MapProcessor() {
     }
     
     /**
      * Processes a file (report file format).
      */
-    public boolean processMapReportFormat(Game game, AreaDataBase adb, PlayersRelation pr, boolean headerProcess, boolean actual) {
+    private static boolean processMapReportFormat(MapDescriptor mapDesc, Game game, AreaDataBase adb, PlayersRelation pr, boolean headerProcess, boolean actual) {
         String line;
         
         System.out.println("processMapReport");        
@@ -109,7 +58,7 @@ public class Map  {
         int plNum=0;
         int relId=0;
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(game.getDirectory()+getFileName()));
+            BufferedReader reader = new BufferedReader(new FileReader(game.getDirectory()+mapDesc.getFileName()));
             // simple matches replaced by String.indexOf, since it's much faster
             while( (line = reader.readLine()) != null ) {
 //                System.out.println("line:"+line);
@@ -227,11 +176,11 @@ public class Map  {
                         AreaInformation ai = new AreaInformation();
                         ai.setId(Integer.parseInt(id));
                         if( currentAreaOwner.equals("****") ) {
-                            currentAreaOwner = getPlayer().getAbbrev();
+                            currentAreaOwner = mapDesc.getPlayer().getAbbrev();
                         }
                         ai.setOwner(game.getPlayer(currentAreaOwner).getNum());
                         if( currentUnitOwner.equals("****") ) {
-                            currentUnitOwner = getPlayer().getAbbrev();
+                            currentUnitOwner = mapDesc.getPlayer().getAbbrev();
                         }
                         if( currentUnitType.length() > 0 ) {
                             ai.setUnitType(Unit.getUnit(currentUnitType).getId());
@@ -349,10 +298,10 @@ public class Map  {
     /**
      * Processes a file (date file format).
      */
-    public boolean processMapDataFormat(Game game, AreaDataBase adb, PlayersRelation pr, boolean headerProcess, boolean actual) {
+    private static boolean processMapDataFormat(MapDescriptor mapDesc, Game game, AreaDataBase adb, PlayersRelation pr, boolean headerProcess, boolean actual) {
         try {
             System.out.println("headerProcess:"+headerProcess);
-            BufferedReader fin = new BufferedReader(new FileReader(game.getDirectory()+getFileName()));
+            BufferedReader fin = new BufferedReader(new FileReader(game.getDirectory()+mapDesc.getFileName()));
             String line;
             int lineNum = 1;
             StringTokenizer st;
@@ -505,13 +454,13 @@ public class Map  {
         return true;
     }
     
-    public boolean processMap(Game game, AreaDataBase adb, PlayersRelation pr, boolean headerProcess, boolean actual) {
-        if( !processMapReportFormat(game, adb, pr, headerProcess, actual) ) {
-            return processMapDataFormat(game, adb, pr, headerProcess, actual);
+    public static boolean processMap(MapDescriptor mapDesc, Game game, AreaDataBase adb, PlayersRelation pr, boolean headerProcess, boolean actual) {
+        if( !processMapReportFormat(mapDesc, game, adb, pr, headerProcess, actual) ) {
+            return processMapDataFormat(mapDesc, game, adb, pr, headerProcess, actual);
         } else {
             return true;
         }
     }
     
     
-} // AODMap
+}

@@ -13,11 +13,11 @@ import java.util.Iterator;
  */
 public class MapCollection  {
     
-    private ArrayList<Map> maps;
+    private ArrayList<MapDescriptor> maps;
     private Game game;
     
     public MapCollection(Game game) {
-        maps = new ArrayList<Map>();
+        maps = new ArrayList<MapDescriptor>();
         setLatestTurn(0);
         this.game = game;
     }
@@ -26,11 +26,11 @@ public class MapCollection  {
         return maps.size();
     }
     
-    public Map getMap(int index) {
+    public MapDescriptor getMap(int index) {
         return maps.get(index);
     }
     
-    public void addMap(Map m) {
+    public void addMap(MapDescriptor m) {
         maps.add(m);
         if( m.getTurnNum() > getLatestTurn() ) {
             setLatestTurn(m.getTurnNum());
@@ -45,10 +45,10 @@ public class MapCollection  {
         }
     }
     
-    public Map getLatestMap(Player p, int maxTurnNum) {
+    public MapDescriptor getLatestMap(Player p, int maxTurnNum) {
         int latest = -1;
         int index = -1;
-        Map m;
+        MapDescriptor m;
         for( int i=0; i<maps.size(); ++i ) {
             m = maps.get(i);
             if( m.getPlayer().equals(p) &&
@@ -64,15 +64,15 @@ public class MapCollection  {
         return null;
     }
     
-    public Map getLatestMap(Player p) {
+    public MapDescriptor getLatestMap(Player p) {
         return getLatestMap(p, Integer.MAX_VALUE);
     }
     
-    public ArrayList<Map> getLatestMaps(int maxTurnNum) {
-        ArrayList<Map> latestMaps = new ArrayList<Map>();
+    public ArrayList<MapDescriptor> getLatestMaps(int maxTurnNum) {
+        ArrayList<MapDescriptor> latestMaps = new ArrayList<MapDescriptor>();
         for( int i = 0; i<game.getPlayerNum(); ++i ) {
             Player p = game.getPlayer(i);
-            Map aodmap = getLatestMap(p, maxTurnNum);
+            MapDescriptor aodmap = getLatestMap(p, maxTurnNum);
             if( aodmap != null ) {
                 latestMaps.add(aodmap);
             }
@@ -96,7 +96,7 @@ public class MapCollection  {
     private void calculateLatestTurn() {
         int newLatestTurn = Integer.MIN_VALUE;
         int actLatestTurn;
-        Iterator<Map> iter = maps.iterator();
+        Iterator<MapDescriptor> iter = maps.iterator();
         while (iter.hasNext()) {
             if( ( actLatestTurn = iter.next().getTurnNum() ) > newLatestTurn ) {
                 newLatestTurn = actLatestTurn;
@@ -132,7 +132,7 @@ public class MapCollection  {
         //System.out.println("calculateAreaDatabase: "+turnNum);
         Player actPlayer = game.getPlayer();
         //System.out.println("actPlayer:"+actPlayer.getNum());
-        Map m = getLatestMap(actPlayer, turnNum);
+        MapDescriptor m = getLatestMap(actPlayer, turnNum);
         System.out.println("m:"+m);
         FileInputStream fis = null;
         AreaDataBase adb;
@@ -147,17 +147,17 @@ public class MapCollection  {
         // my map
         boolean actual = true;
         int actturn = m.getTurnNum();
-        m.processMap(game, adb, pr, true, actual);
+        MapProcessor.processMap(m, game, adb, pr, true, actual);
         //System.out.println("my map processed");
         //ai269 = adb.getAreaInformation(269);
         // other maps
         if( !onlyMyMap ) {
-            ArrayList<Map> v = getLatestMaps(turnNum);
+            ArrayList<MapDescriptor> v = getLatestMaps(turnNum);
             for( int i=0; i<v.size(); ++i ) {
                 m = v.get(i);
                 if( !m.getPlayer().equals(actPlayer) ) {
                     actual = ( actturn ==  m.getTurnNum() );
-                    m.processMap(game, adb, pr, false, actual);
+                    MapProcessor.processMap( m, game, adb, pr, false, actual);
                 }
             }
         }

@@ -100,7 +100,7 @@ public class ReportManager extends JDialog implements  ActionListener {
             ReportEditor repEditor = new ReportEditor(new JFrame(), getGame(), ReportEditor.EDIT);
             int index = reportsList.getSelectedIndex();
             if( index != -1 ) {
-                Map map =  getGame().getMapcoll().getMap(index);
+                MapDescriptor map =  getGame().getMapcoll().getMap(index);
                 repEditor.setFields(map.getTurnNum(), map.getFileName(), map.getPlayer());
                 repEditor.setVisible(true);
                 if( repEditor.getStatus() == repEditor.OK ) {

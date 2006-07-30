@@ -130,7 +130,7 @@ public class ReportEditor extends JDialog
         } else if( source.equals(addButton) ) {
             Player p = game.getPlayer(playerChoice.getSelectedIndex()+1);
             int turnNum = new Integer(turnNumTextField.getText()).intValue();
-            Map newMap = new Map(turnNum, fileTextField.getText(), p);
+            MapDescriptor newMap = new MapDescriptor(turnNum, fileTextField.getText(), p);
             game.getMapcoll().addMap(newMap);
             setStatus(OK);
             setVisible(false);

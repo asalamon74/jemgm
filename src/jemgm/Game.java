@@ -63,7 +63,7 @@ public class Game  {
                     int turn = Integer.parseInt(st.nextToken());
                     String mapFileName = st.nextToken();
                     Player mapPlayer = getPlayer(st.nextToken());
-                    Map aodmap = new Map(turn, mapFileName, mapPlayer);
+                    MapDescriptor aodmap = new MapDescriptor(turn, mapFileName, mapPlayer);
                     mapcoll.addMap(aodmap);
                 }
                 

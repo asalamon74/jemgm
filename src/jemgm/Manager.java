@@ -190,7 +190,8 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         StyleConstants.setBold(s, true);        
         
         tabbedPane = new JTabbedPane();
-        tabbedPane.add("Map", new JScrollPane(battleField, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
+//        tabbedPane.add("Map", new JScrollPane(battleField, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
+        tabbedPane.add("Map", battleField);
         tabbedPane.add("Relations", vpr);
         tabbedPane.add("Alliance headlines", allianceHeadlines);
         tabbedPane.add("Chart", Charts.getInstance(this));

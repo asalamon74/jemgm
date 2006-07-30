@@ -168,7 +168,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         northPanel.add(commandPanel);
         northPanel.add(commandButtonPanel);
         battleField = new HexBattleFieldPanel(this);
-        battleField.setBackground(HexMap.unknownColor);
+        //battleField.setBackground(HexMap.unknownColor);
         battleField.addMouseListener(new PopupListener());
         //battleField.setSize(2000,2000);
         commentTextArea = new JTextArea(40,40);        

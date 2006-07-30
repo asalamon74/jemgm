@@ -1,7 +1,7 @@
 package jemgm;
 
-import java.util.Vector;
 import java.io.*;
+import java.util.ArrayList;
 
 /**
  * MapCollection
@@ -12,11 +12,11 @@ import java.io.*;
  */
 public class MapCollection  {
     
-    private Vector<Map> maps;
+    private ArrayList<Map> maps;
     private Game game;
     
     public MapCollection(Game game) {
-        maps = new Vector<Map>();
+        maps = new ArrayList<Map>();
         setLatestTurn(0);
         this.game = game;
     }
@@ -26,11 +26,11 @@ public class MapCollection  {
     }
     
     public Map getMap(int index) {
-        return maps.elementAt(index);
+        return maps.get(index);
     }
     
     public void addMap(Map m) {
-        maps.addElement(m);
+        maps.add(m);
         sort();
         if( m.getTurnNum() > getLatestTurn() ) {
             setLatestTurn(m.getTurnNum());
@@ -38,9 +38,9 @@ public class MapCollection  {
     }
     
     public void deleteMap(int num) {
-        maps.removeElementAt(num);
+        maps.remove(num);
         if( maps.size() > 0 ) {
-            setLatestTurn(maps.elementAt(0).getTurnNum());
+            setLatestTurn(maps.get(0).getTurnNum());
         }
     }
     
@@ -49,7 +49,7 @@ public class MapCollection  {
         int index = -1;
         Map m;
         for( int i=0; i<maps.size(); ++i ) {
-            m = maps.elementAt(i);
+            m = maps.get(i);
             if( m.getPlayer().equals(p) &&
                     m.getTurnNum() > latest &&
                     m.getTurnNum() <= maxTurnNum) {
@@ -58,7 +58,7 @@ public class MapCollection  {
             }
         }
         if( index != -1 ) {
-            return maps.elementAt(index);
+            return maps.get(index);
         }
         return null;
     }
@@ -67,26 +67,26 @@ public class MapCollection  {
         return getLatestMap(p, Integer.MAX_VALUE);
     }
     
-    public Vector<Map> getLatestMaps(int maxTurnNum) {
-        Vector<Map> latestMaps = new Vector<Map>();
+    public ArrayList<Map> getLatestMaps(int maxTurnNum) {
+        ArrayList<Map> latestMaps = new ArrayList<Map>();
         for( int i = 0; i<game.getPlayerNum(); ++i ) {
             Player p = game.getPlayer(i);
             Map aodmap = getLatestMap(p, maxTurnNum);
             if( aodmap != null ) {
-                latestMaps.addElement(aodmap);
+                latestMaps.add(aodmap);
             }
         }
         return latestMaps;
     }
     
-    public Vector getLatestMaps() {
+    public ArrayList getLatestMaps() {
         return getLatestMaps(Integer.MAX_VALUE);
     }
     
     public String toString() {
         String ret="";
         for( int i = 0; i<maps.size(); ++i ) {
-            ret += maps.elementAt(i).toString()+"\n";
+            ret += maps.get(i).toString()+"\n";
         }
         return ret;
     }
@@ -94,18 +94,17 @@ public class MapCollection  {
     
     private void sort() {
         int size = maps.size();
-        Map lastMap = maps.elementAt(size-1);
+        Map lastMap = maps.get(size-1);
         int lastTurn = lastMap.getTurnNum();
         int index = size-2;
-        while( index >= 0 && lastTurn > maps.elementAt(index).getTurnNum()) {
+        while( index >= 0 && lastTurn > maps.get(index).getTurnNum()) {
             --index;
         }
         if( index < size -2 ) {
             Map swap = lastMap;
-            maps.removeElementAt(size-1);
-            maps.insertElementAt(swap, index+1);
-        }
-        
+            maps.remove(size-1);
+            maps.add(index+1, swap);
+        }        
     }
     
     int latestTurn;
@@ -155,9 +154,9 @@ public class MapCollection  {
         //ai269 = adb.getAreaInformation(269);
         // other maps
         if( !onlyMyMap ) {
-            Vector<Map> v = getLatestMaps(turnNum);
+            ArrayList<Map> v = getLatestMaps(turnNum);
             for( int i=0; i<v.size(); ++i ) {
-                m = v.elementAt(i);
+                m = v.get(i);
                 if( !m.getPlayer().equals(actPlayer) ) {
                     actual = ( actturn ==  m.getTurnNum() );
                     m.processMap(game, adb, pr, false, actual);

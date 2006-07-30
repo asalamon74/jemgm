@@ -2,6 +2,7 @@ package jemgm;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * MapCollection
@@ -31,7 +32,6 @@ public class MapCollection  {
     
     public void addMap(Map m) {
         maps.add(m);
-        sort();
         if( m.getTurnNum() > getLatestTurn() ) {
             setLatestTurn(m.getTurnNum());
         }
@@ -40,7 +40,8 @@ public class MapCollection  {
     public void deleteMap(int num) {
         maps.remove(num);
         if( maps.size() > 0 ) {
-            setLatestTurn(maps.get(0).getTurnNum());
+            //setLatestTurn(maps.get(0).getTurnNum());
+            calculateLatestTurn();
         }
     }
     
@@ -92,19 +93,16 @@ public class MapCollection  {
     }
     
     
-    private void sort() {
-        int size = maps.size();
-        Map lastMap = maps.get(size-1);
-        int lastTurn = lastMap.getTurnNum();
-        int index = size-2;
-        while( index >= 0 && lastTurn > maps.get(index).getTurnNum()) {
-            --index;
+    private void calculateLatestTurn() {
+        int newLatestTurn = Integer.MIN_VALUE;
+        int actLatestTurn;
+        Iterator<Map> iter = maps.iterator();
+        while (iter.hasNext()) {
+            if( ( actLatestTurn = iter.next().getTurnNum() ) > newLatestTurn ) {
+                newLatestTurn = actLatestTurn;
+            }
         }
-        if( index < size -2 ) {
-            Map swap = lastMap;
-            maps.remove(size-1);
-            maps.add(index+1, swap);
-        }        
+        setLatestTurn( newLatestTurn );
     }
     
     int latestTurn;

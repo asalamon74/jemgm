@@ -47,7 +47,7 @@ public abstract class AbstractBattleFieldPanel extends JLayeredPane implements M
         addMouseMotionListener(this);
     }
     
-    public void paint(Graphics g) {
+    public void paint(Graphics graphics) {
         System.out.println("abstract paint");
         if( !initted && getAdb().getYSize() != 0 ) {
             System.out.println("ready to init");
@@ -60,7 +60,7 @@ public abstract class AbstractBattleFieldPanel extends JLayeredPane implements M
                 needRepaint = false;
             }
             System.out.println("drawImage x,y");
-            g.drawImage(imageBuffer, -xOffset, -yOffset, this);            
+            graphics.drawImage(imageBuffer, -xOffset, -yOffset, this);            
         }
     }
     

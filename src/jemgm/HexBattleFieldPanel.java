@@ -547,11 +547,11 @@ public class HexBattleFieldPanel extends AbstractBattleFieldPanel {
                             nri = ((reali+ni-1) % getAdb().getXSize())+1;
                             nrj = ((realj+nj-1) % getAdb().getYSize())+1;
                             AreaInformation nai = getAdb().getAreaInformation(getAdb().getId(nri, nrj));
-                            if(  nai != null && ai.getOwner() >= 1 && nai.getOwner() >= 1 &&
+                            if( ai != null && nai != null && ai.getOwner() >= 1 && nai.getOwner() >= 1 &&
                                         plr.getSimpleRelation(ai.getOwner(), nai.getOwner()) == PlayersRelation.RelationType.WAR) {
                                     drawLineBetween(g, reali, realj, nri, nrj, frontLineColor, frontLineStroke);
                             }
-                            if( nai != null && ai.getOwner() >= 1 && nai.getOwner() >= 1 &&
+                            if( ai != null && nai != null && ai.getOwner() >= 1 && nai.getOwner() >= 1 &&
                                     plr.getSimpleRelation(ai.getOwner(), nai.getOwner()) == PlayersRelation.RelationType.ALLY) {
                                 drawLineBetween(g, reali, realj, nri, nrj, friendlyLineColor, frontLineStroke);
                             }

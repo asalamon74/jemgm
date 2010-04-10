@@ -285,8 +285,7 @@ public class HexBattleFieldPanel extends AbstractBattleFieldPanel {
      * when the user adds a new command.
      */
     public class AreaLayerPanel extends BufferedPanel {
-        
-                        
+                                
         /**
          * This is the real paint method.
          */
@@ -297,6 +296,10 @@ public class HexBattleFieldPanel extends AbstractBattleFieldPanel {
                 // not yet initialized
                 return;
             }
+
+            // clear the board
+            g.setColor( unknownColor );
+            g.fillRect(0, 0, xPixels, yPixels);
             PlayersRelation plr = getAodm().getTurn(getAodm().getActTurnNumber()).getPr();
             
 //            g.setColor(getBackground());

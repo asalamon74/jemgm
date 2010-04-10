@@ -81,6 +81,7 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
         menuBar.add(optionsMenu);
         
         addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
             public void windowClosing(WindowEvent evt) {
                 exitForm(evt);
             }

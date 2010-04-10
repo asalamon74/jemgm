@@ -159,7 +159,8 @@ public class Area implements Cloneable {
     public boolean isNeighbour(Area area) {
         return area != null && neighbours.contains(new Integer(area.getId()) );
     }
-    
+
+    @Override
     public Object clone() throws CloneNotSupportedException {
         Area area = new Area();
         area.setId(getId());

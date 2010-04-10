@@ -15,7 +15,7 @@ import java.io.*;
  */
 public class AreaDataBase  {
     
-    protected HashMap<Integer, AreaInformation> areas;
+    protected Map<Integer, AreaInformation> areas;
     protected int[][]   areaNums;
     protected Game   game;
     
@@ -35,11 +35,11 @@ public class AreaDataBase  {
         
         this.game = game;
         areas = new HashMap<Integer, AreaInformation>();
-        if( this.xSize == 0 || this.ySize == 0 ) {
-            this.xSize = xSize;
-            this.ySize = ySize;
+        if( AreaDataBase.xSize == 0 || AreaDataBase.ySize == 0 ) {
+            AreaDataBase.xSize = xSize;
+            AreaDataBase.ySize = ySize;
         }
-        areaNums = new int[this.xSize][this.ySize];
+        areaNums = new int[AreaDataBase.xSize][AreaDataBase.ySize];
         
         try {
             fin = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream( mapHexFileName ) ));

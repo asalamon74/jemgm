@@ -1,8 +1,8 @@
 package jemgm;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * MapCollection
@@ -83,7 +83,8 @@ public class MapCollection  {
     public ArrayList getLatestMaps() {
         return getLatestMaps(Integer.MAX_VALUE);
     }
-    
+
+    @Override
     public String toString() {
         String ret="";
         for( int i = 0; i<maps.size(); ++i ) {
@@ -134,7 +135,6 @@ public class MapCollection  {
         //System.out.println("actPlayer:"+actPlayer.getNum());
         MapDescriptor m = getLatestMap(actPlayer, turnNum);
         System.out.println("m:"+m);
-        FileInputStream fis = null;
         AreaDataBase adb;
         EmgGameParameters gt = game.getGameType();
         if( gt.hasStaticMap() ) {
@@ -152,7 +152,7 @@ public class MapCollection  {
         //ai269 = adb.getAreaInformation(269);
         // other maps
         if( !onlyMyMap ) {
-            ArrayList<MapDescriptor> v = getLatestMaps(turnNum);
+            List<MapDescriptor> v = getLatestMaps(turnNum);
             for( int i=0; i<v.size(); ++i ) {
                 m = v.get(i);
                 if( !m.getPlayer().equals(actPlayer) ) {

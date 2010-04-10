@@ -46,7 +46,8 @@ public abstract class AbstractBattleFieldPanel extends JLayeredPane implements M
         addMouseListener(this);
         addMouseMotionListener(this);
     }
-    
+
+    @Override
     public void paint(Graphics graphics) {
         System.out.println("abstract paint");
         if( !initted && getAdb().getYSize() != 0 ) {
@@ -191,10 +192,10 @@ public abstract class AbstractBattleFieldPanel extends JLayeredPane implements M
     }
     
     public void mousePressed(java.awt.event.MouseEvent evt) {
-        if( (evt.getModifiers() & evt.BUTTON2_MASK) != 0 ) {
+        if( (evt.getModifiers() & MouseEvent.BUTTON2_MASK) != 0 ) {
             xDragStart = evt.getX();
             yDragStart = evt.getY();
-        } else if( (evt.getModifiers() & evt.BUTTON1_MASK) != 0 ) {
+        } else if( (evt.getModifiers() & MouseEvent.BUTTON1_MASK) != 0 ) {
             Dimension d = getAreaPlace(evt.getX(), evt.getY());
             AreaInformation ai = adb.getAreaInformation(adb.getId(d.width,d.height));
             if( ai != null ) {
@@ -222,7 +223,7 @@ public abstract class AbstractBattleFieldPanel extends JLayeredPane implements M
     }    
     
     public void mouseDragged(MouseEvent evt) {        
-         if( (evt.getModifiers() & evt.BUTTON2_MASK) != 0 ) {
+         if( (evt.getModifiers() & MouseEvent.BUTTON2_MASK) != 0 ) {
             xOffset -= evt.getX() - xDragStart;
             yOffset -= evt.getY() - yDragStart;
             xDragStart = evt.getX();
@@ -311,7 +312,8 @@ public abstract class AbstractBattleFieldPanel extends JLayeredPane implements M
             setPreferredSize( new Dimension(xPixels, yPixels));
             setSize( xPixels, yPixels);
         }
-        
+
+        @Override
         public void paint(Graphics g) {   
             System.out.println("Buffered paint ");
             /*if( !visible ) {

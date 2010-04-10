@@ -296,7 +296,7 @@ public class MapProcessor {
     }
     
     /**
-     * Processes a file (date file format).
+     * Processes a file (data file format).
      */
     private static boolean processMapDataFormat(MapDescriptor mapDesc, Game game, AreaDataBase adb, PlayersRelation pr, boolean headerProcess, boolean actual) {
         try {
@@ -404,44 +404,46 @@ public class MapProcessor {
                     break;
                 }
                 st = new StringTokenizer(line, " ");
-                AreaInformation ai = new AreaInformation();
-                ai.setId( Integer.parseInt( st.nextToken() ) );
-                int owner = Integer.parseInt( st.nextToken() );
-                //		System.out.println("owner:"+owner);
-                if( owner != game.getPlayerNum() ) {
-                    ai.setOwner(owner);
-                } else {
-                    ai.setOwner(-1);
-                }
-                //		System.out.println("aiowner:"+ai.getOwner());
-                if( !game.getGameType().hasStaticMap() ) {
-                    ai.setAreaType( Integer.parseInt( st.nextToken() ) );
-                    ai.setSupplyPointNum( Integer.parseInt( st.nextToken() ) );
-                    for( int i=0; i<10; ++i ) {
-                        ai.addNeighbour( Integer.parseInt( st.nextToken() ) );
+                if (st.countTokens() == 22) {
+                    AreaInformation ai = new AreaInformation();
+                    ai.setId(Integer.parseInt(st.nextToken()));
+                    int owner = Integer.parseInt(st.nextToken());
+                    //		System.out.println("owner:"+owner);
+                    if (owner != game.getPlayerNum()) {
+                        ai.setOwner(owner);
+                    } else {
+                        ai.setOwner(-1);
                     }
-                    int x1 = Integer.parseInt( st.nextToken());
-                    int x2 = Integer.parseInt( st.nextToken());
-                    int x3 = Integer.parseInt( st.nextToken());
-                    int y1 = Integer.parseInt( st.nextToken());
-                    int y2 = Integer.parseInt( st.nextToken());
-                    int y3 = Integer.parseInt( st.nextToken());
-                    ai.addHex(x1, y1);
-                    ai.addHex(x2, y2);
-                    ai.addHex(x3, y3);
-                }
-                ai.setUnitOwner( Integer.parseInt( st.nextToken() ) );
-                ai.setUnitType(Integer.parseInt( st.nextToken()));
-                if( actual ) {
-                    //		    System.out.println("xsize:"+adb.getXSize());
-                    //		    System.out.println("ysize:"+adb.getYSize());
-                    //		    System.out.println("mergeai");
-                    adb.mergeAreaInformation(ai);
-                } else {
-                    //		    System.out.println("ma xsize:"+adb.getXSize());
-                    //		    System.out.println("ma ysize:"+adb.getYSize());
-                    //		    System.out.println("mergea");
-                    adb.mergeArea((Area)ai);
+                    //		System.out.println("aiowner:"+ai.getOwner());
+                    if (!game.getGameType().hasStaticMap()) {
+                        ai.setAreaType(Integer.parseInt(st.nextToken()));
+                        ai.setSupplyPointNum(Integer.parseInt(st.nextToken()));
+                        for (int i = 0; i < 10; ++i) {
+                            ai.addNeighbour(Integer.parseInt(st.nextToken()));
+                        }
+                        int x1 = Integer.parseInt(st.nextToken());
+                        int x2 = Integer.parseInt(st.nextToken());
+                        int x3 = Integer.parseInt(st.nextToken());
+                        int y1 = Integer.parseInt(st.nextToken());
+                        int y2 = Integer.parseInt(st.nextToken());
+                        int y3 = Integer.parseInt(st.nextToken());
+                        ai.addHex(x1, y1);
+                        ai.addHex(x2, y2);
+                        ai.addHex(x3, y3);
+                    }
+                    ai.setUnitOwner(Integer.parseInt(st.nextToken()));
+                    ai.setUnitType(Integer.parseInt(st.nextToken()));
+                    if (actual) {
+                        //		    System.out.println("xsize:"+adb.getXSize());
+                        //		    System.out.println("ysize:"+adb.getYSize());
+                        //		    System.out.println("mergeai");
+                        adb.mergeAreaInformation(ai);
+                    } else {
+                        //		    System.out.println("ma xsize:"+adb.getXSize());
+                        //		    System.out.println("ma ysize:"+adb.getYSize());
+                        //		    System.out.println("mergea");
+                        adb.mergeArea((Area) ai);
+                    }
                 }
             }
         } catch( FileNotFoundException e ) {
@@ -453,7 +455,7 @@ public class MapProcessor {
         }
         return true;
     }
-    
+
     public static boolean processMap(MapDescriptor mapDesc, Game game, AreaDataBase adb, PlayersRelation pr, boolean headerProcess, boolean actual) {
         if( !processMapReportFormat(mapDesc, game, adb, pr, headerProcess, actual) ) {
             return processMapDataFormat(mapDesc, game, adb, pr, headerProcess, actual);

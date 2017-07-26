@@ -302,7 +302,6 @@ public class Manager extends JFrame implements ActionListener, ItemListener {
             vc.setVisible(true);
         } else if( source.equals(sendMenuItem) ) {
             try {
-                //		String fromAddress = "asalamon@hu.inter.net";
                 String fromAddress = game.getPlayer().getEmail();
                 if( fromAddress == null || fromAddress.equals("") ) {
                     JOptionPane.showMessageDialog(this, "Please fill out you e-mail address", "Email warning", JOptionPane.WARNING_MESSAGE);
